@@ -863,12 +863,19 @@ class ComplaintController extends Controller
     public function getEngineerDetails(Request $request)
     {
         $zone_id = $request->input('zone_id');
-        if($zone_id){
+            if($zone_id){
 
-        $engineer_details = AssignEngineer::with('user')->where('zone_id',$zone_id)->where('status',1)->groupBy('engineer_id')->get();
-        return response()->json($engineer_details);
+            $engineer_details = AssignEngineer::with('user')
+            ->where('zone_id',$zone_id)
+            ->where('status',1)->groupBy('engineer_id')->get();
+            return response()->json($engineer_details);
 
-       }
+            }else{
+                $engineer_details = AssignEngineer::with('user')
+                // ->where('zone_id',$zone_id)
+                ->where('status',1)->groupBy('engineer_id')->get();
+                return response()->json($engineer_details);
+            }
     }
 
     public function export(Request $request)

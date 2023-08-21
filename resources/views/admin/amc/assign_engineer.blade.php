@@ -374,6 +374,43 @@
     });
 </script>
 <script>
+    $(window).load(function(){
+        var zone_id = $('option:selected', this).attr('data-themeid');  
+        $.ajax({
+            type: "GET",
+            url: "{{ route('get-all-engineers-details.ajax') }}",
+            data: {
+                'zone_id': zone_id
+            },
+            success: function(response) {
+                if(response) {
+                    var toAppend = '';
+                    toAppend +='<option value="">All Engineers</option>';
+                    $.each(response, function(i,o){
+                        // console.log(o.user.first_name);
+                        first_name = '';
+                        if (o.user.first_name != null)  {
+                            first_name = o.user.first_name;
+                        }
+
+                        middle_name = '';
+                        if (o.user.middle_name != null)  {
+                            middle_name = o.user.middle_name;
+                        }
+
+                        last_name = '';
+                        if (o.user.last_name != null)  {
+                            last_name = o.user.last_name;
+                        }
+                        toAppend += '<option  value="'+o.user.id+'" data-themeid="'+o.user.id+'">'+first_name+' '+middle_name+' '+last_name+'</option>';
+                    });
+                    $('#assigned_to').html(toAppend);
+                }else{
+                    alert("No engineer found");
+                }
+            }
+        });
+    });
     $("#zone_id").change(function(){  
         var zone_id = $('option:selected', this).attr('data-themeid');  
         $.ajax({
