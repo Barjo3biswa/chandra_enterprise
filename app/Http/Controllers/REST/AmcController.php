@@ -354,6 +354,7 @@ class AmcController extends Controller
                 ]);
             }
             DB::commit();
+            \Log::info(json_encode($json_arr));
             return response()->json($json_arr);} else {
             return response()->json([
                 'success' => false,
