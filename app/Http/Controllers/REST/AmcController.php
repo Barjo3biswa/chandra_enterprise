@@ -136,7 +136,7 @@ class AmcController extends Controller
             ]);
         } */
         // return $request->all();
-        // \Log::info(json_encode($request->all()));
+        \Log::info(json_encode($request->all()));
         if ($user) {
 
             $json_arr         = array();
