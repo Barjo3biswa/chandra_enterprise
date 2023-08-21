@@ -256,7 +256,7 @@
                             @if(Auth::user()->can('view client outstanding bill'))
                             <li class="{{request()->is('client-outstanding-bill')? 'active' : '' }}{{request()->is('client-outstanding-bill/*')? 'active' : '' }}">
                                 <a href="{{ route('view-all-client-outstanding-bill') }}">
-                                    <span>Client Bill Outstanding</span>
+                                    <span>Total Client Billing</span>
                                 </a>
                             </li>
                             @endif
