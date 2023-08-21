@@ -124,6 +124,7 @@ class AmcController extends Controller
  */
     public function store(Request $request)
     {
+        return $request->all();
         $user = JWTAuth::parseToken()->toUser();
         /* $rules = [
             "scr_no"    => "required|unique:daily_service_reports,scr_no"
@@ -135,7 +136,7 @@ class AmcController extends Controller
                 "message"   => "Scr No Already Exists."
             ]);
         } */
-        // return $request->all();
+        return $request->all();
         \Log::info(json_encode($request->all()));
         if ($user) {
 
