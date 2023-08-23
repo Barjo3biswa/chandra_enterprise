@@ -70,7 +70,7 @@ class AmcController extends Controller
 
                         $amc_trans = ClientAmcTransaction::with('client_master')->whereIn('client_amc_masters_id', $trans)
                                                             ->where('engineer_status',0)
-                                                            ->where('status', 1)->get();
+                                                            ->where('status', 11)->get();
 
                         if (isset($amc_trans)) {
                             $json_arr['status']    = true;
