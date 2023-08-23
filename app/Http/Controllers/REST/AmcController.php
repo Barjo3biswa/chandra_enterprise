@@ -726,40 +726,41 @@ class AmcController extends Controller
 
     public function upcomingAMC()
     {
-        $user             = JWTAuth::parseToken()->toUser();
-        $all_amc_upcoming = collect();
-        try {
-            $all_amc_upcoming = ClientAmcTransaction::with([
-                'client_master', 'client_master.client'
-            ])->whereHas("client_master", function($client_master_query) use ($user){
-                return $client_master_query->where(function($where_query) use ($user){
-                    $where_query->whereIn("client_id", function($query) use ($user){
-                        return $query->select("client_id")
-                            ->from("assign_engineers")
-                            ->where("engineer_id", auth()->id())
-                            ->where("status", 1);
-                    })
-                    ->orWhereIn("id", function($select_ids) use ($user){
-                        return $select_ids->from("amc_assigned_to_engineers")
-                            ->select("client_amc_master_id")->where("engineer_id", auth()->id());
-                    });
-                });
-            })
-            ->where("status", 1)
-            ->where('engineer_status',0)
-            ->get();
-        } catch (\Exception $e) {
-            \Log::error($e);
-            return response()->json([
-                "status"  => false,
-                "message" => "Whoops! Something went wrong.",
-                "data"    => $all_amc_upcoming,
-            ]);
-        }
-        return response()->json([
-            "status"  => ($all_amc_upcoming->count() > 0 ? true : false),
-            "message" => $all_amc_upcoming->count() . " Records found.",
-            "data"    => $all_amc_upcoming,
-        ]);
+        dd("ok");
+        // $user             = JWTAuth::parseToken()->toUser();
+        // $all_amc_upcoming = collect();
+        // try {
+        //     $all_amc_upcoming = ClientAmcTransaction::with([
+        //         'client_master', 'client_master.client'
+        //     ])->whereHas("client_master", function($client_master_query) use ($user){
+        //         return $client_master_query->where(function($where_query) use ($user){
+        //             $where_query->whereIn("client_id", function($query) use ($user){
+        //                 return $query->select("client_id")
+        //                     ->from("assign_engineers")
+        //                     ->where("engineer_id", auth()->id())
+        //                     ->where("status", 1);
+        //             })
+        //             ->orWhereIn("id", function($select_ids) use ($user){
+        //                 return $select_ids->from("amc_assigned_to_engineers")
+        //                     ->select("client_amc_master_id")->where("engineer_id", auth()->id());
+        //             });
+        //         });
+        //     })
+        //     ->where("status", 1)
+        //     ->where('engineer_status',0)
+        //     ->get();
+        // } catch (\Exception $e) {
+        //     \Log::error($e);
+        //     return response()->json([
+        //         "status"  => false,
+        //         "message" => "Whoops! Something went wrong.",
+        //         "data"    => $all_amc_upcoming,
+        //     ]);
+        // }
+        // return response()->json([
+        //     "status"  => ($all_amc_upcoming->count() > 0 ? true : false),
+        //     "message" => $all_amc_upcoming->count() . " Records found.",
+        //     "data"    => $all_amc_upcoming,
+        // ]);
     }
 }
