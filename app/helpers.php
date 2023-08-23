@@ -220,7 +220,9 @@ function monthlyAMC(){
     })
     // ->where("amc_month", date("F"))
     // ->where("amc_year",  date("Y"))
+    ->where("engineer_status",0)
     ->where("status", 1);
+   
     return $current_month_amc;
 }
 

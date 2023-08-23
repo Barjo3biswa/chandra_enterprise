@@ -634,93 +634,82 @@ class AmcController extends Controller
     public function allMonthlyAmc(Request $request)
     {
 
-        // $user         = JWTAuth::parseToken()->toUser();
-        // $today        = date('F');
-        // $current_year = date('Y');
+        $user         = JWTAuth::parseToken()->toUser();
+        $today        = date('F');
+        $current_year = date('Y');
 
-        // if ($user) {
+        if ($user) {
 
-        //     $json_arr               = array();
-        //     $today_date             = date('d-m-Y');
-        //     $json_arr['today_date'] = $today_date;
-        //     $last_dsr_report        = DailyServiceReport::with('dsr_transaction', 'client', 'product', 'engineer', 'complaint')
-        //         ->where('entry_by', $user->id)
-        //         ->where('status', 1)
-        //         ->orderBy('entry_datetime', 'desc')
-        //         ->first();
+            $json_arr               = array();
+            $today_date             = date('d-m-Y');
+            $json_arr['today_date'] = $today_date;
+            $last_dsr_report        = DailyServiceReport::with('dsr_transaction', 'client', 'product', 'engineer', 'complaint')
+                ->where('entry_by', $user->id)
+                ->where('status', 1)
+                ->orderBy('entry_datetime', 'desc')
+                ->first();
 
-        //     if (isset($last_dsr_report)) {
-        //         $json_arr['status']          = true;
-        //         $json_arr['last_dsr_report'] = $last_dsr_report;
-        //     } else {
-        //         $json_arr['status']          = false;
-        //         $json_arr['last_dsr_report'] = [];
-        //     }
+            if (isset($last_dsr_report)) {
+                $json_arr['status']          = true;
+                $json_arr['last_dsr_report'] = $last_dsr_report;
+            } else {
+                $json_arr['status']          = false;
+                $json_arr['last_dsr_report'] = [];
+            }
 
-        //     $assigned_spare_parts = SparePartMaster::with('spare_part_transaction', 'user', 'spare_part', 'spare_part_transaction.spare_part')->where('engineer_id', $user->id)->where('trans_type', '=', 'iss')->where('status', 1)->get();
+            $assigned_spare_parts = SparePartMaster::with('spare_part_transaction', 'user', 'spare_part', 'spare_part_transaction.spare_part')->where('engineer_id', $user->id)->where('trans_type', '=', 'iss')->where('status', 1)->get();
 
-        //     $all_sp_prts = [];
-        //     if (isset($assigned_spare_parts)) {
+            $all_sp_prts = [];
+            if (isset($assigned_spare_parts)) {
 
-        //         foreach ($assigned_spare_parts as $key => $value) {
-        //             $all_spare_parts = SparePartTransaction::where('spare_part_master_id', $value->id)->where('status', 1)->get();
-        //             // dd($all_spare_parts);
+                foreach ($assigned_spare_parts as $key => $value) {
+                    $all_spare_parts = SparePartTransaction::where('spare_part_master_id', $value->id)->where('status', 1)->get();
+                    // dd($all_spare_parts);
 
-        //             $all_spare_parts_to_array = SparePartTransaction::with('spare_part')->where('spare_part_master_id', $value->id)->where('status', 1)->get()->toArray();
+                    $all_spare_parts_to_array = SparePartTransaction::with('spare_part')->where('spare_part_master_id', $value->id)->where('status', 1)->get()->toArray();
 
-        //             foreach ($all_spare_parts_to_array as $key1 => $value1) {
-        //                 array_push($all_sp_prts, $value1);
-        //                 // $all_sp_prts[$value1->spare_parts_id]  = $value1;
+                    foreach ($all_spare_parts_to_array as $key1 => $value1) {
+                        array_push($all_sp_prts, $value1);
+                        // $all_sp_prts[$value1->spare_parts_id]  = $value1;
 
-        //             }
+                    }
 
-        //             // dd($all_sp_prts);
+                    // dd($all_sp_prts);
 
-        //             // dd($stock_in_hand);
+                    // dd($stock_in_hand);
 
-        //         }
-        //         $json_arr['status']               = true;
-        //         $json_arr['assigned_spare_parts'] = $all_sp_prts;
-        //     } else {
-        //         $json_arr['status']               = true;
-        //         $json_arr['assigned_spare_parts'] = [];
-        //     }
-        //     $current_month_amc = monthlyAMC()
-        //         ->get();
-        //     if($current_month_amc->count()){
-        //         $json_arr['status']             = true;
-        //         $json_arr['monthly_amc_list']   = $current_month_amc;
-        //         $json_arr['client_master']      = [];
-        //         $json_arr['client']             = [];
-        //         $json_arr['amc_master_product'] = [];
-        //         $json_arr['product']            = [];
-        //     }else{
-        //         $json_arr['status']             = false;
-        //         $json_arr['monthly_amc_list']   = [];
-        //         $json_arr['client_master']      = [];
-        //         $json_arr['client']             = [];
-        //         $json_arr['amc_master_product'] = [];
-        //         $json_arr['product']            = [];
-        //     }
-
-        //     // return response()->json([
-        //     //         'status' => true,
-        //     //         'data'=> [
-        //     //             'monthly_amc_list' => $monthly_amc_list,
-        //     //             'last_dsr_report' =>$last_dsr_report,
-        //     //             'today_date' => $today_date,
-        //     //             'assigned_spare_parts' => $all_sp_prts
-        //     //             ]
-        //     //         ]);
-        //     //          }
-        //     if (isset($json_arr["status"]) && !$json_arr["status"]) {
-        //         $json_arr["message"] = "No data found for preventive maintenance.";
-        //     }
-        //     return response()->json($json_arr);} else {
-        //     return response()->json([
-        //         'success' => false,
-        //     ]);
-        // }
+                }
+                $json_arr['status']               = true;
+                $json_arr['assigned_spare_parts'] = $all_sp_prts;
+            } else {
+                $json_arr['status']               = true;
+                $json_arr['assigned_spare_parts'] = [];
+            }
+            $current_month_amc = monthlyAMC()
+                ->get();
+            if($current_month_amc->count()){
+                $json_arr['status']             = true;
+                $json_arr['monthly_amc_list']   = $current_month_amc;
+                $json_arr['client_master']      = [];
+                $json_arr['client']             = [];
+                $json_arr['amc_master_product'] = [];
+                $json_arr['product']            = [];
+            }else{
+                $json_arr['status']             = false;
+                $json_arr['monthly_amc_list']   = [];
+                $json_arr['client_master']      = [];
+                $json_arr['client']             = [];
+                $json_arr['amc_master_product'] = [];
+                $json_arr['product']            = [];
+            }
+            if (isset($json_arr["status"]) && !$json_arr["status"]) {
+                $json_arr["message"] = "No data found for preventive maintenance.";
+            }
+            return response()->json($json_arr);} else {
+            return response()->json([
+                'success' => false,
+            ]);
+        }
     }
 
     public function upcomingAMC()
