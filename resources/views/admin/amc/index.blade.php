@@ -72,7 +72,8 @@
                                 </tr>
                             </tfoot>
                             <tbody>
-                                @php$i = 1;
+                                @php
+                                    // $i = 1;
                                     $colour = null;
                                 @endphp
                                 @foreach ($client_amcs as $key => $client_amc)
@@ -92,7 +93,7 @@
                                         }
                                     @endphp
                                     <tr style="color: {{ $colour }}">
-                                        <td>{{ $i }}</td>
+                                        <td>{{ ++$key }}</td>
                                         <td>{{ ucwords($client_amc->client->zone->name ?? 'NA') }}</td>
                                         <td>{{ ucwords($client_amc->client->name) }}</td>
                                         <td>{{ ucwords($client_amc->client->branch_name) }}</td>
