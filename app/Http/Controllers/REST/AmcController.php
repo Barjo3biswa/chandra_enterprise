@@ -68,7 +68,9 @@ class AmcController extends Controller
 
                     foreach ($clnt_amc as $key => $value) {
 
-                        $amc_trans = ClientAmcTransaction::with('client_master')->whereIn('client_amc_masters_id', $trans)->where('status', 1)->get();
+                        $amc_trans = ClientAmcTransaction::with('client_master')->whereIn('client_amc_masters_id', $trans)
+                                                            ->where('engineer_status',0)
+                                                            ->where('status', 1)->get();
 
                         if (isset($amc_trans)) {
                             $json_arr['status']    = true;
@@ -742,8 +744,8 @@ class AmcController extends Controller
                     });
                 });
             })
-            ->where("status", 11)
-            // ->where('engineer_status',)
+            ->where("status", 1)
+            ->where('engineer_status',0)
             ->get();
         } catch (\Exception $e) {
             \Log::error($e);
