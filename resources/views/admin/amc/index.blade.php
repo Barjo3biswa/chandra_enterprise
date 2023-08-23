@@ -145,7 +145,7 @@
                                             </div>
                                         </td>
                                     </tr>
-                                    @php $i++ @endphp
+                                    {{-- @php $i++ @endphp --}}
                                 @endforeach
                             </tbody>
                         </table>
