@@ -150,6 +150,14 @@ class AmcController extends Controller
             $dsr = new DailyServiceReport();
             DB::beginTransaction();
             try {
+
+                $client_master = ClientAmcMaster::where('client_id',$client_id)->where("status", 1)->first();
+                $transaction = $client_master->amc_master_transaction->where('engineer_status',0)->first();
+                ClientAmcTransaction::where('id',$transaction->id)->update([
+                                                                          'engineer_status' => 1,
+                                                                          'engineer_id'    => auth()->id(),
+                                                                        ]);
+
                 $products = $request->products;
                 if ($maintenance_type == 2) {
                     $dsr->client_id = $client_id;    
@@ -735,6 +743,7 @@ class AmcController extends Controller
                 });
             })
             ->where("status", 1)
+            ->where('engineer_status',0)
             ->get();
         } catch (\Exception $e) {
             \Log::error($e);
