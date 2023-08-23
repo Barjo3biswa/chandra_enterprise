@@ -714,6 +714,7 @@ class AmcController extends Controller
 
     public function upcomingAMC()
     {
+        dd("ok");
         $user             = JWTAuth::parseToken()->toUser();
         $all_amc_upcoming = collect();
         try {
