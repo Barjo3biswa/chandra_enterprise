@@ -742,7 +742,7 @@ class AmcController extends Controller
                     });
                 });
             })
-            ->where("status", 1)
+            ->where("status", 11)
             ->where('engineer_status',0)
             ->get();
         } catch (\Exception $e) {
