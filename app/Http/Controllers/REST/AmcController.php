@@ -714,7 +714,7 @@ class AmcController extends Controller
 
     public function upcomingAMC()
     {
-        dd("ok");
+        // dd("ok");
         $user             = JWTAuth::parseToken()->toUser();
         $all_amc_upcoming = collect();
         try {
@@ -735,7 +735,7 @@ class AmcController extends Controller
                 });
             })
             ->where("status", 1)
-            ->where('engineer_status',0)
+            ->where("engineer_status",0)->take(2)
             ->get();
         } catch (\Exception $e) {
             \Log::error($e);
