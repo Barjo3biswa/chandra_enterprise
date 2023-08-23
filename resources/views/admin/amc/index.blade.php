@@ -86,10 +86,10 @@
                                             $colour = "green";
                                         }
                                         if($client_amc->amc_master_transaction->where('engineer_status',1)->count()>0 && $client_amc->amc_master_transaction->where('engineer_status',0)->count()>0){
-                                            $colour = "yellow";
+                                            $colour = "orange";
                                         }
                                         if($client_amc->amc_master_transaction->where('engineer_status',0)->count()==0){
-                                            $colour = "yellow";
+                                            $colour = "red";
                                         }
                                     @endphp
                                     <tr style="color: {{ $colour }}">
