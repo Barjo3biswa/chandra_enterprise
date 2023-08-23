@@ -735,7 +735,7 @@ class AmcController extends Controller
                 });
             })
             // ->where("status", 1)
-            // ->where("engineer_status",0)
+            ->where("engineer_status",0)
             ->get();
         } catch (\Exception $e) {
             \Log::error($e);
