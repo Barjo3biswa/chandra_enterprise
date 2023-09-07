@@ -231,7 +231,7 @@ class ComplaintController extends Controller
                     ];
                     DailyServiceReportProduct::create($insert_data);
                 }
-                DailyServiceReportProduct::create($insert_data);
+                // DailyServiceReportProduct::create($insert_data);
                 $json_arr['status'] = true;
                 $json_arr['message'] = 'Successfully submitted complaint details';
             }else{

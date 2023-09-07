@@ -80,6 +80,7 @@ class ClientAmcController extends Controller
      */
     public function create()
     {
+        // dd("ok");
         $zones = Zone::where('status',1)->get();
         foreach ($zones as $key => $value) {
             $clients = Client::where('zone_id',$value->id)->where('status',1)->groupBy('name')->get();
@@ -99,170 +100,165 @@ class ClientAmcController extends Controller
      */
     public function store(Request $request)
     {
-       
+        // dd($request->all());
         $zone_id = $request->zone_id;
         $roster_id = $request->roster_id;
         $amc_duration = $request->amc_duration;
         $amc_demand = $request->amc_demand;
      
+        DB::beginTransaction();
+        try{
+            if($request->input('amc_start_date') != ''){
+                    $req_date = $request->input('amc_start_date');
+                    $tdr = str_replace("/", "-", $req_date);
+                    $new_mnf_dt = date('Y-m-d',strtotime($tdr));
+                }
+            else
+                $new_mnf_dt = " ";
 
-        if($request->input('amc_start_date') != ''){
-                $req_date = $request->input('amc_start_date');
-                $tdr = str_replace("/", "-", $req_date);
-                $new_mnf_dt = date('Y-m-d',strtotime($tdr));
+            $amc_start_date = $new_mnf_dt;
+
+            // $amc_end_date = date('Y-m-d', strtotime("+".$amc_duration."month", strtotime($amc_start_date)));
+
+            $amc_end_date = date('Y-m-d', strtotime("+".$amc_duration."month", strtotime($amc_start_date)));
+            $amc_end_date = date('Y-m-d', strtotime("-1 day", strtotime($amc_end_date)));
+            // dd($amc_end_date);
+
+            $validator = Validator::make($request->all(), ClientAmcMaster::$rules);
+
+            if ($validator->fails()) return  Redirect::back()->withErrors($validator)->withInput();
+
+            $clientAmcMaster = new ClientAmcMaster();
+
+            $client_name = $request->client_id;
+            $branch = $request->branch;
+            $client_id = Client::where('branch_name',$branch)->where('name',$client_name)->first()->id;
+            $clientAmcMaster->client_id = $client_id;
+
+            $clientAmcMaster->roster_id = $roster_id;
+            $clientAmcMaster->amc_start_date = $amc_start_date;
+            $clientAmcMaster->amc_end_date = $amc_end_date;
+
+
+            $c = count($request->amc_rqst_date)-1;
+
+            if($request->amc_rqst_date[$c] != ''){
+                    $req_date_new = $request->amc_rqst_date[$c];
+                    $tdr_new = str_replace("/", "-", $req_date_new);
+                    $new_mnf_dt_new = date('Y-m-d',strtotime($tdr_new));
+                }
+            else
+                $new_mnf_dt_new = " ";
+
+            $amc_rqst_date[$c] = $new_mnf_dt_new;
+
+            // $c = count($amc_rqst_date)-1;
+        
+            // dd($amc_rqst_date[$c]);
+
+            // $clientAmcMaster->amc_end_date = $amc_rqst_date[$c];
+
+            // dd($amc_start_date);
+
+        
+            $financial_years = getFinacialDate($amc_start_date ,true);
+
+            $clientAmcMaster->financial_year = $financial_years;
+
+            $clientAmcMaster->amc_duration = $amc_duration;
+
+            if ($amc_demand != null) {
+                $clientAmcMaster->amc_amount = $amc_demand;
+            }else{
+                $clientAmcMaster->amc_amount = 0;
             }
-        else
-            $new_mnf_dt = " ";
 
-        $amc_start_date = $new_mnf_dt;
+            // $clientAmcMaster->amc_amount = $amc_demand;
 
-        // $amc_end_date = date('Y-m-d', strtotime("+".$amc_duration."month", strtotime($amc_start_date)));
+            // $clientAmcMaster->amc_bill_no = $request->amc_bill_no; 
 
-        $amc_end_date = date('Y-m-d', strtotime("+".$amc_duration."month", strtotime($amc_start_date)));
-        $amc_end_date = date('Y-m-d', strtotime("-1 day", strtotime($amc_end_date)));
-        // dd($amc_end_date);
+            // if($request->input('amc_bill_date') != ''){
+            //         $req_date_bill = $request->input('amc_bill_date');
+            //         $tdr_bill = str_replace("/", "-", $req_date_bill);
+            //         $new_mnf_dt_bill = date('Y-m-d',strtotime($tdr_bill));
+            //     }
+            // else
+            //     $new_mnf_dt_bill = " ";
 
-        $validator = Validator::make($request->all(), ClientAmcMaster::$rules);
+            // $amc_bill_date = $new_mnf_dt_bill;
 
-        if ($validator->fails()) return  Redirect::back()->withErrors($validator)->withInput();
-
-        $clientAmcMaster = new ClientAmcMaster();
-
-        $client_name = $request->client_id;
-        $branch = $request->branch;
-        $client_id = Client::where('branch_name',$branch)->where('name',$client_name)->first()->id;
-        $clientAmcMaster->client_id = $client_id;
-
-        $clientAmcMaster->roster_id = $roster_id;
-        $clientAmcMaster->amc_start_date = $amc_start_date;
-        $clientAmcMaster->amc_end_date = $amc_end_date;
+            // $clientAmcMaster->amc_bill_date = $amc_bill_date;
 
 
-        $c = count($request->amc_rqst_date)-1;
 
-        if($request->amc_rqst_date[$c] != ''){
-                $req_date_new = $request->amc_rqst_date[$c];
-                $tdr_new = str_replace("/", "-", $req_date_new);
-                $new_mnf_dt_new = date('Y-m-d',strtotime($tdr_new));
+            $clientAmcMaster->save();
+
+            $validator = Validator::make($request->all(), ClientAmcProduct::$rules);
+
+            if ($validator->fails()) return  Redirect::back()->withErrors($validator)->withInput();
+
+            if ($request->product_detail) {
+                foreach ($request->product_detail as $key1 => $value1) {
+                    $client_amc_product = new ClientAmcProduct();
+                    $client_amc_product->client_amc_masters_id = $clientAmcMaster->id;
+                    $client_amc_product->product_id = $request->product_detail[$key1];
+                    $client_amc_product->save();
+                }
             }
-        else
-            $new_mnf_dt_new = " ";
 
-        $amc_rqst_date[$c] = $new_mnf_dt_new;
+            $validator = Validator::make($request->all(), ClientAmcTransaction::$rules);
 
-        // $c = count($amc_rqst_date)-1;
-    
-        // dd($amc_rqst_date[$c]);
+            if ($validator->fails()) return  Redirect::back()->withErrors($validator)->withInput();
 
-        // $clientAmcMaster->amc_end_date = $amc_rqst_date[$c];
+            if ($request->amc_rqst_date) {
+                foreach ($request->amc_rqst_date as $key => $value) {
+                $clientAmcMasterTransaction = new ClientAmcTransaction();
+                $clientAmcMasterTransaction->client_amc_masters_id = $clientAmcMaster->id;
+                if($request->amc_rqst_date[$key] != ''){
+                    $req_date1 = $request->amc_rqst_date[$key];
+                    $tdr1 = str_replace("/", "-", $req_date1);
+                    $new_mnf_dt1 = date('Y-m-d',strtotime($tdr1));
+                        }
+                    else
+                        $new_mnf_dt1 = " ";
+                    $amc_rqst_date[$key] = $new_mnf_dt1;
+                    $clientAmcMasterTransaction->amc_rqst_date = $amc_rqst_date[$key];
+                    $amc_mnth = date("F",strtotime($amc_rqst_date[$key]));
+                    $amc_yr = date("Y",strtotime($amc_rqst_date[$key]));              
+                    $clientAmcMasterTransaction->amc_month = $amc_mnth;
+                    $clientAmcMasterTransaction->amc_year = $amc_yr;
+                    // $amc_fin_year = date("m",strtotime($amc_rqst_date[$key]));
+                    // $financial_years = getFinacialDate($amc_rqst_date[$key] ,true);
+                    // $clientAmcMasterTransaction->financial_year = $financial_years;
+                    // $clientAmcMasterTransaction->amc_demand = $amc_demand;
+                    $today = date('Y-m-d');
+                    $clientAmcMasterTransaction->amc_demand_date = $today;
+                    if ($request->amc_demand_collected != null) {
+                        $clientAmcMasterTransaction->amc_demand_collected = $request->amc_demand_collected[$key];
+                    }else{
+                        $clientAmcMasterTransaction->amc_demand_collected = 0;
+                    }        
+                    $clientAmcMasterTransaction->amc_demand_collected_date = $request->amc_demand_collected_date[$key];
+                    $clientAmcMasterTransaction->amc_status = $clientAmcMaster->status;
+                    $clientAmcMasterTransaction->amc_done_on = $today;
+                    $clientAmcMasterTransaction->remarks = $request->remarks[$key];
+                    $clientAmcMasterTransaction->amc_transaction_remarks = $request->remarks[$key];
+                    $clientAmcMasterTransaction->save();
+                }
 
-        // dd($amc_start_date);
-
-     
-        $financial_years = getFinacialDate($amc_start_date ,true);
-
-        $clientAmcMaster->financial_year = $financial_years;
-
-        $clientAmcMaster->amc_duration = $amc_duration;
-
-        if ($amc_demand != null) {
-            $clientAmcMaster->amc_amount = $amc_demand;
-        }else{
-            $clientAmcMaster->amc_amount = 0;
-        }
-
-        // $clientAmcMaster->amc_amount = $amc_demand;
-
-        // $clientAmcMaster->amc_bill_no = $request->amc_bill_no; 
-
-        // if($request->input('amc_bill_date') != ''){
-        //         $req_date_bill = $request->input('amc_bill_date');
-        //         $tdr_bill = str_replace("/", "-", $req_date_bill);
-        //         $new_mnf_dt_bill = date('Y-m-d',strtotime($tdr_bill));
-        //     }
-        // else
-        //     $new_mnf_dt_bill = " ";
-
-        // $amc_bill_date = $new_mnf_dt_bill;
-
-        // $clientAmcMaster->amc_bill_date = $amc_bill_date;
-
-
-
-        $clientAmcMaster->save();
-
-        $validator = Validator::make($request->all(), ClientAmcProduct::$rules);
-
-        if ($validator->fails()) return  Redirect::back()->withErrors($validator)->withInput();
-
-        if ($request->product_detail) {
-            foreach ($request->product_detail as $key1 => $value1) {
-                $client_amc_product = new ClientAmcProduct();
-                $client_amc_product->client_amc_masters_id = $clientAmcMaster->id;
-                $client_amc_product->product_id = $request->product_detail[$key1];
-                $client_amc_product->save();
+                $engineer = AssignEngineer::where('client_id',$client_id)->first();
+                $data = [
+                    'client_amc_master_id' => $clientAmcMasterTransaction->client_amc_masters_id,
+                    "engineer_id"   => $engineer->engineer_id,
+                    "remark"        => "Auto Assigned",
+                ];
+                AmcAssignedToEngineers::create($data);
+                // dd($engineer);
             }
-        }
-
-        $validator = Validator::make($request->all(), ClientAmcTransaction::$rules);
-
-        if ($validator->fails()) return  Redirect::back()->withErrors($validator)->withInput();
-
-        if ($request->amc_rqst_date) {
-
-            foreach ($request->amc_rqst_date as $key => $value) {
-               $clientAmcMasterTransaction = new ClientAmcTransaction();
-               $clientAmcMasterTransaction->client_amc_masters_id = $clientAmcMaster->id;
-
-               if($request->amc_rqst_date[$key] != ''){
-                $req_date1 = $request->amc_rqst_date[$key];
-                $tdr1 = str_replace("/", "-", $req_date1);
-                $new_mnf_dt1 = date('Y-m-d',strtotime($tdr1));
-                    }
-                else
-                    $new_mnf_dt1 = " ";
-
-                $amc_rqst_date[$key] = $new_mnf_dt1;
-
-               $clientAmcMasterTransaction->amc_rqst_date = $amc_rqst_date[$key];
-
-               $amc_mnth = date("F",strtotime($amc_rqst_date[$key]));
-               $amc_yr = date("Y",strtotime($amc_rqst_date[$key]));
-
-               
-               $clientAmcMasterTransaction->amc_month = $amc_mnth;
-
-               $clientAmcMasterTransaction->amc_year = $amc_yr;
-
-
-               // $amc_fin_year = date("m",strtotime($amc_rqst_date[$key]));
-
-
-               // $financial_years = getFinacialDate($amc_rqst_date[$key] ,true);
-
-            
-               // $clientAmcMasterTransaction->financial_year = $financial_years;
-
-
-               // $clientAmcMasterTransaction->amc_demand = $amc_demand;
-
-               $today = date('Y-m-d');
-               $clientAmcMasterTransaction->amc_demand_date = $today;
-               if ($request->amc_demand_collected != null) {
-                   $clientAmcMasterTransaction->amc_demand_collected = $request->amc_demand_collected[$key];
-               }else{
-                $clientAmcMasterTransaction->amc_demand_collected = 0;
-               }
-               
-               $clientAmcMasterTransaction->amc_demand_collected_date = $request->amc_demand_collected_date[$key];
-               $clientAmcMasterTransaction->amc_status = $clientAmcMaster->status;
-               $clientAmcMasterTransaction->amc_done_on = $today;
-               $clientAmcMasterTransaction->remarks = $request->remarks[$key];
-               $clientAmcMasterTransaction->amc_transaction_remarks = $request->remarks[$key];
-
-               $clientAmcMasterTransaction->save();
-
-            }
+            DB::commit();
+        }catch(\Exception $e){
+            Session::flash('error','Something Went Wrong');
+            DB::rollback();
         }
 
         Session::flash('success','Successfully added client AMC details');

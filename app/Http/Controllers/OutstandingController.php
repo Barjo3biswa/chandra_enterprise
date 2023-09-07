@@ -433,28 +433,22 @@ class OutstandingController extends Controller
         }
 
         if ($request->client_id) {
-
-          $client_names = Client::where('name','like','%'.$request->client_id.'%')->where('status',1)->get()->toArray();
-                
+            $client_names = Client::where('name','like','%'.$request->client_id.'%')->where('status',1)->get()->toArray(); 
                 $clients_id = [];
                 foreach ($client_names as $key => $client_name) {
                     array_push($clients_id, $client_name['id']);
                 }
-            $engg_bill_follow = $engg_bill_follow->whereIn('client_id',$clients_id);
-                    
-          }
+            $engg_bill_follow = $engg_bill_follow->whereIn('client_id',$clients_id);            
+        }
 
-          if ($request->branch) {
-
-          $branch_names = Client::select('id')->where('branch_name','like','%'.$request->branch.'%')->where('status',1)->get()->toArray();
-                
+        if ($request->branch) {
+            $branch_names = Client::select('id')->where('branch_name','like','%'.$request->branch.'%')->where('status',1)->get()->toArray();        
                 $branchs = [];
                 foreach ($branch_names as $key => $branch_name) {
                     array_push($branchs, $branch_name['id']);
                 }
-    
                 $engg_bill_follow = $engg_bill_follow->whereIn('client_id',$branchs);
-          }
+        }
 
         $engg_bill_follow = $engg_bill_follow->orderBy('id','desc')->get();
 
@@ -476,8 +470,6 @@ class OutstandingController extends Controller
     {
        $engg_client_bill_id = Crypt::decrypt($id); 
        $engg_bill_follow = EngineerBillFollowUp::with('client_bill','engineer','client')->where('id',$engg_client_bill_id)->where('status',1)->first();
-
-
        return view('admin.outstanding.engineer-bill-follow-show',compact('engg_bill_follow'));
     }
 

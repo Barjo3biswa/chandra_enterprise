@@ -17,6 +17,7 @@ class ServiceReportController extends Controller
      */
     public function index(Request $request)
     {
+		// dd("ok");
 		$date_from  = "2019-01-01";
 		$date_to 	= date("Y-m-d");
         $users = User::where('status',1)->get();
@@ -107,9 +108,11 @@ class ServiceReportController extends Controller
      */
     public function show($id)
     {
+		// dd("ok");
         $dsr_id = Crypt::decrypt($id);
         $dsr = DailyServiceReport::with('dsr_transaction','client','engineer','complaint', "dsr_products")->where('id',$dsr_id)->where('status',1)->first();
-        return view('admin.dsr.show',compact('dsr'));
+        // dd($dsr->dsr_transaction);
+		return view('admin.dsr.show',compact('dsr'));
     }
 
     /**
