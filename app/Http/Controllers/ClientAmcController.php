@@ -246,7 +246,7 @@ class ClientAmcController extends Controller
                     $clientAmcMasterTransaction->save();
                 }
 
-                $engineer = AssignEngineer::where('client_id',$client_id)->first();
+                $engineer = AssignEngineer::where('client_id',$client_id)->where('status',1)->first();
                 $data = [
                     'client_amc_master_id' => $clientAmcMasterTransaction->client_amc_masters_id,
                     "engineer_id"   => $engineer->engineer_id,
