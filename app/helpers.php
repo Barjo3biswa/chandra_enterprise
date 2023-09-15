@@ -180,48 +180,60 @@ function monthlyAMC(){
     ->get();
     // return [$daily_service_reports->toSql(), $daily_service_reports->getBindings()];
     // ################### END NEW QUERY IMPLIMENTED #########################
-    $current_month_amc = ClientAmcTransaction::with([
-        'client_master', 'client_master.client', 
-        'client_master.amc_master_product', 'client_master.amc_master_product.product'
-    ])->whereHas("client_master", function($client_master_query) use ($daily_service_reports, $today){
-        return $client_master_query->where(function($where_query){
-            $where_query->whereIn("client_id", function($query){
-                return $query->select("client_id")
-                    ->from("assign_engineers")
-                    ->where("engineer_id", auth()->id())
-                    ->where("status", 1);
-            })
-            ->orWhereIn("id", function($select_ids){
-                return $select_ids->from("amc_assigned_to_engineers")
-                    ->select("client_amc_master_id")->where("engineer_id", auth()->id());
-            });
-        })->where(function($current_month_pending_amcs) use ($daily_service_reports){
-            if($daily_service_reports->count()){
-                // single product assigned to single client so client id filter not added. 
-                // product id filter is works like client 
-                foreach($daily_service_reports as $dsr){
-                    $current_month_pending_amcs->orWhere(function($orWhereQuery) use ($dsr){
-                        foreach($dsr->dsr_products as $dsr_product){
-                            return $orWhereQuery->whereDoesntHave("amc_master_product", function($amc_product_query) use ($dsr_product){
-                                return $amc_product_query->where("product_id", $dsr_product->product_id);
-                            });
-                        }
-                    });
-                }
-            }
-        })->where(function($sub_where) use ($today){
-            return $sub_where->where("amc_start_date", "<=", $today)
-                ->where("amc_end_date", ">=", $today);
-        });
-    })
-    ->where(function($date_query)  use ($date_from, $date_to){
-        return $date_query->whereDate("amc_rqst_date",">=", $date_from)
-        ->where("amc_rqst_date", "<=", $date_to);
-    })
-    // ->where("amc_month", date("F"))
-    // ->where("amc_year",  date("Y"))
-    ->where("engineer_status",0)
-    ->where("status", 1);
+
+    $current_month_amc = ClientAmcTransaction::with(['client_master', 'client_master.client','client_master.amc_master_product', 'client_master.amc_master_product.product'])
+                                                        ->whereHas('assigned_engineers', function($querry) use ($today){
+                                                               return $querry->where('engineer_id',auth()->id())->where('status',1);
+                                                        })
+                                                        ->where("amc_month", date("F"))
+                                                        ->where("amc_year",  date("Y"))
+                                                        ->where("status", 1)
+                                                        ->where("engineer_status",0)
+                                                        ->get();
+
+
+    // $current_month_amc = ClientAmcTransaction::with([
+    //     'client_master', 'client_master.client', 
+    //     'client_master.amc_master_product', 'client_master.amc_master_product.product'
+    // ])->whereHas("client_master", function($client_master_query) use ($daily_service_reports, $today){
+    //     return $client_master_query->where(function($where_query){
+    //         $where_query->whereIn("client_id", function($query){
+    //             return $query->select("client_id")
+    //                 ->from("assign_engineers")
+    //                 ->where("engineer_id", auth()->id())
+    //                 ->where("status", 1);
+    //         })
+    //         ->orWhereIn("id", function($select_ids){
+    //             return $select_ids->from("amc_assigned_to_engineers")
+    //                 ->select("client_amc_master_id")->where("engineer_id", auth()->id());
+    //         });
+    //     })->where(function($current_month_pending_amcs) use ($daily_service_reports){
+    //         if($daily_service_reports->count()){
+    //             // single product assigned to single client so client id filter not added. 
+    //             // product id filter is works like client 
+    //             foreach($daily_service_reports as $dsr){
+    //                 $current_month_pending_amcs->orWhere(function($orWhereQuery) use ($dsr){
+    //                     foreach($dsr->dsr_products as $dsr_product){
+    //                         return $orWhereQuery->whereDoesntHave("amc_master_product", function($amc_product_query) use ($dsr_product){
+    //                             return $amc_product_query->where("product_id", $dsr_product->product_id);
+    //                         });
+    //                     }
+    //                 });
+    //             }
+    //         }
+    //     })->where(function($sub_where) use ($today){
+    //         return $sub_where->where("amc_start_date", "<=", $today)
+    //             ->where("amc_end_date", ">=", $today);
+    //     });
+    // })
+    // ->where(function($date_query)  use ($date_from, $date_to){
+    //     return $date_query->whereDate("amc_rqst_date",">=", $date_from)
+    //     ->where("amc_rqst_date", "<=", $date_to);
+    // })
+    // // ->where("amc_month", date("F"))
+    // // ->where("amc_year",  date("Y"))
+    // ->where("engineer_status",0)
+    // ->where("status", 1);
    
     return $current_month_amc;
 }
