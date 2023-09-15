@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Assign\AmcAssignedToEngineers;
 use Illuminate\Database\Eloquent\Model;
 
 class ClientAmcTransaction extends Model
@@ -17,6 +18,11 @@ class ClientAmcTransaction extends Model
     public function client_master()
 	{
 	    return $this->belongsTo('App\Models\ClientAmcMaster', 'client_amc_masters_id');
+	}
+
+    public function assigned_engineers()
+	{
+	    return $this->hasMany(AmcAssignedToEngineers::class, 'client_amc_trans_id', "id");
 	}
 
 }

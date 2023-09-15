@@ -211,48 +211,63 @@ class ClientAmcController extends Controller
             if ($validator->fails()) return  Redirect::back()->withErrors($validator)->withInput();
 
             if ($request->amc_rqst_date) {
+                $flag=0;
                 foreach ($request->amc_rqst_date as $key => $value) {
-                $clientAmcMasterTransaction = new ClientAmcTransaction();
-                $clientAmcMasterTransaction->client_amc_masters_id = $clientAmcMaster->id;
-                if($request->amc_rqst_date[$key] != ''){
-                    $req_date1 = $request->amc_rqst_date[$key];
-                    $tdr1 = str_replace("/", "-", $req_date1);
-                    $new_mnf_dt1 = date('Y-m-d',strtotime($tdr1));
-                        }
-                    else
+                    $clientAmcMasterTransaction = new ClientAmcTransaction();
+                    $clientAmcMasterTransaction->client_amc_masters_id = $clientAmcMaster->id;
+                    if($request->amc_rqst_date[$key] != ''){
+                        $req_date1 = $request->amc_rqst_date[$key];
+                        $tdr1 = str_replace("/", "-", $req_date1);
+                        $new_mnf_dt1 = date('Y-m-d',strtotime($tdr1));
+                    }
+                    else{
                         $new_mnf_dt1 = " ";
-                    $amc_rqst_date[$key] = $new_mnf_dt1;
-                    $clientAmcMasterTransaction->amc_rqst_date = $amc_rqst_date[$key];
-                    $amc_mnth = date("F",strtotime($amc_rqst_date[$key]));
-                    $amc_yr = date("Y",strtotime($amc_rqst_date[$key]));              
-                    $clientAmcMasterTransaction->amc_month = $amc_mnth;
-                    $clientAmcMasterTransaction->amc_year = $amc_yr;
-                    // $amc_fin_year = date("m",strtotime($amc_rqst_date[$key]));
-                    // $financial_years = getFinacialDate($amc_rqst_date[$key] ,true);
-                    // $clientAmcMasterTransaction->financial_year = $financial_years;
-                    // $clientAmcMasterTransaction->amc_demand = $amc_demand;
-                    $today = date('Y-m-d');
-                    $clientAmcMasterTransaction->amc_demand_date = $today;
-                    if ($request->amc_demand_collected != null) {
-                        $clientAmcMasterTransaction->amc_demand_collected = $request->amc_demand_collected[$key];
-                    }else{
-                        $clientAmcMasterTransaction->amc_demand_collected = 0;
-                    }        
-                    $clientAmcMasterTransaction->amc_demand_collected_date = $request->amc_demand_collected_date[$key];
-                    $clientAmcMasterTransaction->amc_status = $clientAmcMaster->status;
-                    $clientAmcMasterTransaction->amc_done_on = $today;
-                    $clientAmcMasterTransaction->remarks = $request->remarks[$key];
-                    $clientAmcMasterTransaction->amc_transaction_remarks = $request->remarks[$key];
-                    $clientAmcMasterTransaction->save();
+                    }
+                           
+                        $amc_rqst_date[$key] = $new_mnf_dt1;
+                        $clientAmcMasterTransaction->amc_rqst_date = $amc_rqst_date[$key];
+                        $amc_mnth = date("F",strtotime($amc_rqst_date[$key]));
+                        $amc_yr = date("Y",strtotime($amc_rqst_date[$key]));              
+                        $clientAmcMasterTransaction->amc_month = $amc_mnth;
+                        $clientAmcMasterTransaction->amc_year = $amc_yr;
+                        // $amc_fin_year = date("m",strtotime($amc_rqst_date[$key]));
+                        // $financial_years = getFinacialDate($amc_rqst_date[$key] ,true);
+                        // $clientAmcMasterTransaction->financial_year = $financial_years;
+                        // $clientAmcMasterTransaction->amc_demand = $amc_demand;
+                        $today = date('Y-m-d');
+                        $clientAmcMasterTransaction->amc_demand_date = $today;
+                        if ($request->amc_demand_collected != null) {
+                            $clientAmcMasterTransaction->amc_demand_collected = $request->amc_demand_collected[$key];
+                        }else{
+                            $clientAmcMasterTransaction->amc_demand_collected = 0;
+                        }        
+                        $clientAmcMasterTransaction->amc_demand_collected_date = $request->amc_demand_collected_date[$key];
+                        $clientAmcMasterTransaction->amc_status = $clientAmcMaster->status;
+                        $clientAmcMasterTransaction->amc_done_on = $today;
+                        $clientAmcMasterTransaction->remarks = $request->remarks[$key];
+                        $clientAmcMasterTransaction->amc_transaction_remarks = $request->remarks[$key];
+                        $clientAmcMasterTransaction->save();
+
+                        $status = 0;
+                        if( $flag==0){
+                            $status = 1;
+                            $flag = 1 ;
+                        }
+
+                        $engineer = AssignEngineer::where('client_id',$client_id)->where('status',1)->first();
+                        // dd($engineer);
+                        $data = [
+                            'client_amc_master_id' => $clientAmcMasterTransaction->client_amc_masters_id,
+                            'client_amc_trans_id' => $clientAmcMasterTransaction->id,
+                            "engineer_id"   => $engineer->engineer_id,
+                            "remark"        => "Auto Assigned",
+                            "status"        => $status,
+                        ];
+                        // dd($data);
+                        AmcAssignedToEngineers::create($data);
                 }
 
-                $engineer = AssignEngineer::where('client_id',$client_id)->where('status',1)->first();
-                $data = [
-                    'client_amc_master_id' => $clientAmcMasterTransaction->client_amc_masters_id,
-                    "engineer_id"   => $engineer->engineer_id,
-                    "remark"        => "Auto Assigned",
-                ];
-                AmcAssignedToEngineers::create($data);
+                
                 // dd($engineer);
             }
             DB::commit();

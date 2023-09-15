@@ -196,24 +196,32 @@ public function login(Request $request)
                 //     $json_arr['monthly_amcs'] = 0;
 
                 // }
-                $eng_assigned_to_amc_count = ClientAmcTransaction::whereHas("client_master", function($client_master_query){
-                    return $client_master_query->where(function($where_query){
-                        $where_query->whereIn("client_id", function($query){
-                            return $query->select("client_id")
-                                ->from("assign_engineers")
-                                ->where("engineer_id", auth()->id())
-                                ->where("status", 1);
-                        })
-                        ->orWhereIn("id", function($select_ids){
-                            return $select_ids->from("amc_assigned_to_engineers")
-                                ->select("client_amc_master_id")->where("engineer_id", auth()->id());
-                        });
-                    });
-                })
-                ->where("amc_month", date("F"))
-                ->where("amc_year",  date("Y"))
-                ->where("status", 1)
-                ->count();
+                // $eng_assigned_to_amc_count = ClientAmcTransaction::whereHas("client_master", function($client_master_query){
+                //     return $client_master_query->where(function($where_query){
+                //         $where_query->whereIn("client_id", function($query){
+                //             return $query->select("client_id")
+                //                 ->from("assign_engineers")
+                //                 ->where("engineer_id", auth()->id())
+                //                 ->where("status", 1);
+                //         })
+                //         ->orWhereIn("id", function($select_ids){
+                //             return $select_ids->from("amc_assigned_to_engineers")
+                //                 ->select("client_amc_master_id")->where("engineer_id", auth()->id());
+                //         });
+                //     });
+                // })
+                // ->where("amc_month", date("F"))
+                // ->where("amc_year",  date("Y"))
+                // ->where("status", 1)
+                // ->count();
+
+                $eng_assigned_to_amc_count = ClientAmcTransaction::with(['client_master', 'client_master.client'])
+                                                        ->whereHas('assigned_engineers', function($querry) use ($user){
+                                                               return $querry->where('engineer_id',auth()->id())->where('status',1);
+                                                        })
+                                                        ->where("status", 1)
+                                                        ->where("engineer_status",0)
+                                                        ->count();
 
                 $json_arr['monthly_amcs'] = $eng_assigned_to_amc_count; 
                 if($eng_assigned_to_amc_count){

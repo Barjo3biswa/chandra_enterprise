@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class AmcAssignedToEngineers extends Model
 {
     use SoftDeletes;
-    protected $fillable  = ['client_amc_master_id', 'engineer_id', "remark"];
+    protected $guarded = ['id'];
     protected $table     = 'amc_assigned_to_engineers';
     public static $rules = [
         // "client_amc_master_id" => "required|exists:client_amc_masters,id",
