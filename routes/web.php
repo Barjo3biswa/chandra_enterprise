@@ -28,6 +28,8 @@ Route::get('/home', function () {
     return redirect('/dashboard');
 });
 
+Route::get('/password/reset/{token}', 'Auth\ResetPasswordController@showResetForm');
+
 Route::post('/password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('user.password.request');
 Route::post('/password/reset', 'Auth\ResetPasswordController@reset')->name('user.password.email');
 Route::get('/password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm');
@@ -38,6 +40,11 @@ Route::get('/home', 'HomeController@index')->name('home');
 Auth::routes();
 
 Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout');
+
+Route::get('/automatic-assign', [
+    'as' => 'automatic-assign',
+    'uses' => 'ClientAmcController@AutomaticAssign'
+]);
 
 
 

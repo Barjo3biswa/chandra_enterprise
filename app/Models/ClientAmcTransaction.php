@@ -22,7 +22,7 @@ class ClientAmcTransaction extends Model
 
     public function assigned_engineers()
 	{
-	    return $this->hasMany(AmcAssignedToEngineers::class, 'client_amc_trans_id', "id");
+	    return $this->hasOne(AmcAssignedToEngineers::class, 'client_amc_trans_id', "id");
 	}
 
 }

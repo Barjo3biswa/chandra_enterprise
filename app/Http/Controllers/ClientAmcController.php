@@ -254,8 +254,11 @@ class ClientAmcController extends Controller
                             $flag = 1 ;
                         }
 
-                        $engineer = AssignEngineer::where('client_id',$client_id)->where('status',1)->first();
-                        // dd($engineer);
+                        $engineer = AssignEngineer::where('client_id',$client_id)->where('zone_id',$zone_id)->where('status',1)->first();
+                        if($engineer==null){
+                            return redirect()->back()->with('error','No Engineer is is assigned to the client of that Zone, Assign First');
+                        }
+                        // dd($client_id,$zone_id);
                         $data = [
                             'client_amc_master_id' => $clientAmcMasterTransaction->client_amc_masters_id,
                             'client_amc_trans_id' => $clientAmcMasterTransaction->id,
@@ -1502,5 +1505,26 @@ class ClientAmcController extends Controller
             }
         }
         return $data_array;
+    }
+
+    public function AutomaticAssign(){
+        $client_amc_trans = ClientAmcTransaction::where(['amc_month'=>date('F'),'amc_year'=>date('Y')])
+                                                ->where(['status'=>1,'engineer_status'=>0])
+                                                ->whereHas("assigned_engineers", function($user_query){
+                                                    return $user_query->where("status",0);
+                                                })
+                                                ->get();
+        foreach($client_amc_trans as $trans){
+            $client_id = $trans->client_master->client_id;
+            $zone_id = $trans->client_master->client->zone_id;
+            $engg_id = $trans->assigned_engineers->engineer_id;
+            $engineer = AssignEngineer::where('client_id',$client_id)->where('zone_id',$zone_id)->where('status',1)->first();
+            if($engineer!==null && $engineer->engineer_id == $engg_id){
+                $trans->assigned_engineers->update(['engineer_id'=>$engineer->engineer_id,'status'=>1]);
+            }else{
+                $trans->assigned_engineers->update(['status'=>1]);
+            }
+        }
+        dd($client_amc_trans);
     }
 }

@@ -188,8 +188,8 @@ function monthlyAMC(){
                                                         ->where("amc_month", date("F"))
                                                         ->where("amc_year",  date("Y"))
                                                         ->where("status", 1)
-                                                        ->where("engineer_status",0)
-                                                        ->get();
+                                                        ->where("engineer_status",0);
+                                                        // ->get();
 
 
     // $current_month_amc = ClientAmcTransaction::with([
