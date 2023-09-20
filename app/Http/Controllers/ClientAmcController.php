@@ -253,7 +253,7 @@ class ClientAmcController extends Controller
                             $status = 1;
                             $flag = 1 ;
                         }
-
+                        dd($client_id,$zone_id);
                         $engineer = AssignEngineer::where('client_id',$client_id)->where('zone_id',$zone_id)->where('status',1)->first();
                         if($engineer==null){
                             return redirect()->back()->with('error','No Engineer is assigned to the client of that Zone, Assign First');
