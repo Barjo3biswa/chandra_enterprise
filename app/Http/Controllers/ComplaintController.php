@@ -853,7 +853,7 @@ class ComplaintController extends Controller
         // $message = "Thank you for contacting Chandra Enterprises. Your machine is ready to use. Kindly contact us in future if you face any problem. -Chandra Enterprises";
         $message = "Your machine is ready to use. Kindly contact us in future if you face any problem. Thank you for contacting us. -Chandra Enterprises";
         if($request->complaint_status == 3){
-                // sendSMSNew($complaint_details->contact_person_ph_no, $message, "1107169046510599595");
+                //////// sendSMSNew($complaint_details->contact_person_ph_no, $message, "1107169046510599595");
                 sendSMSNew($complaint_details->contact_person_ph_no, $message, "1107169279332271785");
         }
         Session::flash('success','Successfully updated complaint deatils for the engineer');
