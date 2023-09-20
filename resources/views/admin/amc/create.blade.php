@@ -239,7 +239,7 @@ $("#zone_id").change(function(){
 // console.log(o.name);
 
 
-toAppend+= '<option  value="'+o.name+'" {{ old('client_id') == "'+o.name+'" ? 'selected' : '' }} data-themeid="'+o.name+'">'+o.zone_id+'</option>';
+toAppend+= '<option  value="'+o.name+'" {{ old('client_id') == "'+o.name+'" ? 'selected' : '' }} data-themeid="'+o.name+'">'+o.name+'</option>';
 });
 
 				$('#client_id').html(toAppend);
