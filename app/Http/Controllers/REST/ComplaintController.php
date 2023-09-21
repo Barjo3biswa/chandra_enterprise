@@ -413,17 +413,17 @@ class ComplaintController extends Controller
             foreach ($data_cc as $key => $value) {
                 array_push($y,$value->email);
             }
-            $data['email_cc'] = $y;
+            // $data['email_cc'] = $y;
 
 
 
-            $data['email_cc'] = $y;
+            // $data['email_cc'] = $y;
     
-            Mail::send('mails.complaint-status', $data, function($message) use($data) {
-            $message->to($data['email_to']);
-            $message->cc($data['email_cc']);
-            $message->subject('Complaint status');
-            });
+            // Mail::send('mails.complaint-status', $data, function($message) use($data) {
+            // $message->to($data['email_to']);
+            // $message->cc($data['email_cc']);
+            // $message->subject('Complaint status');
+            // });
             // $message = "Thank you for contacting Chandra Enterprises. Your machine is ready to use. Kindly contact us in future if you face any problem. -Chandra Enterprises";
             $message = "Your machine is ready to use. Kindly contact us in future if you face any problem. Thank you for contacting us. -Chandra Enterprises";
             if($request->complaint_status == 3){
