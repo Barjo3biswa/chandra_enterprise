@@ -715,7 +715,7 @@ class ComplaintController extends Controller
                         //////// sendSMSNew($complaint_details->contact_person_ph_no, $message, "1107169046510599595");
                         sendSMSNew($complaint->contact_person_ph_no, $message, "1107169279332271785");
                 }
-
+                \Log::info($complaint);
 
 
                 return response()->json($json_arr);
