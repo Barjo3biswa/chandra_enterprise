@@ -420,6 +420,7 @@ class ComplaintController extends Controller
     public function update(Request $request, $id)
     {
         \Log::info($request->all());
+        \Log::info(["im here"]);
         $user = JWTAuth::parseToken()->toUser(); 
         try {
             if($user){
