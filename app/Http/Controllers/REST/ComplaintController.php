@@ -136,7 +136,7 @@ class ComplaintController extends Controller
      */
     public function store(Request $request)
     {
-        \Log::info($request->all());
+        // \Log::info($request->all());
         // return $request->all();
         $user = JWTAuth::parseToken()->toUser(); 
         // dd($user);
