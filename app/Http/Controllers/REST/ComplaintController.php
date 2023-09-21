@@ -419,8 +419,8 @@ class ComplaintController extends Controller
      */
     public function update(Request $request, $id)
     {
-        \Log::info($request->all());
-        \Log::info("im here");
+        // \Log::info($request->all());
+        // \Log::info("im here");
         $user = JWTAuth::parseToken()->toUser(); 
         try {
             if($user){
@@ -715,7 +715,7 @@ class ComplaintController extends Controller
                         //////// sendSMSNew($complaint_details->contact_person_ph_no, $message, "1107169046510599595");
                         sendSMSNew($complaint->contact_person_ph_no, $message, "1107169279332271785");
                 }
-                \Log::info($complaint);
+                // \Log::info($complaint);
 
 
                 return response()->json($json_arr);
