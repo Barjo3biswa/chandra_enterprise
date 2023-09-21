@@ -11,6 +11,7 @@ use Config;
 use App\Models\Dsr\DailyServiceReportProduct;
 
 use App\Models\Complaint, App\Models\ComplaintMaster, App\Models\ComplaintTransaction, App\Models\Client, App\Models\Group, App\Models\Product, App\Models\Zone, App\Models\Assign\AssignEngineer, App\User, App\Models\Assign\AssignProductToClient, App\Models\Email, App\Models\SparePartMaster, App\Models\SparePartTransaction, App\Models\Dsr\DailyServiceReport, App\Models\IssueEngineer, App\Models\IssueEngineerTransaction, App\Models\Dsr\DailyServiceReportTransaction;
+use Illuminate\Support\Facades\Mail;
 
 class ComplaintController extends Controller
 {
@@ -697,6 +698,25 @@ class ComplaintController extends Controller
                         }
                     }
                 }
+
+
+
+                $data['email_cc'] = $y;
+      
+                Mail::send('mails.complaint-status', $data, function($message) use($data) {
+                $message->to($data['email_to']);
+                $message->cc($data['email_cc']);
+                $message->subject('Complaint status');
+                });
+                // $message = "Thank you for contacting Chandra Enterprises. Your machine is ready to use. Kindly contact us in future if you face any problem. -Chandra Enterprises";
+                $message = "Your machine is ready to use. Kindly contact us in future if you face any problem. Thank you for contacting us. -Chandra Enterprises";
+                if($request->complaint_status == 3){
+                        //////// sendSMSNew($complaint_details->contact_person_ph_no, $message, "1107169046510599595");
+                        sendSMSNew($complaint->contact_person_ph_no, $message, "1107169279332271785");
+                }
+
+
+
                 return response()->json($json_arr);
             }else{
                 return response()->json([
