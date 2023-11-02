@@ -412,116 +412,85 @@ direction: false
 
 
 	$("#group_id").change(function(){
-
 		var group_id = $('option:selected', this).attr('data-themeid');
-
 		var e = document.getElementById("client_id");
 		var client_id = e.options[e.selectedIndex].value;
-
 		var b = document.getElementById("branch");
 		var branch = b.options[b.selectedIndex].value;
+		$.ajax({
+			type: "GET",
+			url: "{{ route('get-all-complaint-master-details.ajax') }}",
+			data: {
+				'group_id': group_id,
+				'client_id': client_id,
+				'branch': branch
+			},
+			success: function(response) {
+				if(response) {
+					var toAppend = '';
+					var toAppendProduct = '';
+					if (response.complaint_master_details.length) {
+						toAppend +='<option value="">All Complaint Masters</option>';
+						$.each(response.complaint_master_details, function(i,o){
+							console.log(o.complaint_details);
+							toAppend += '<option value="'+o.id+'" data-themeid="'+o.id+'">'+o.complaint_details+'</option>';
+						});
+						toAppend +='<option value="1">Not in the list</option>';
+						$('#complaint_master_id').html(toAppend);
+					}else{
+						$('#complaint_master_id').html("");
+						toAppend +='<option value="">All Complaint Masters</option>';
+						toAppend +='<option value="1">Not in the list</option>';
+						$('#complaint_master_id').html(toAppend);
+					}
+					if(!response.product_details.length){
+						$('#product_details').hide();
+						$('#error_msg').show();
+						$('.cnt-submit').hide();
+						$(".cnt-submit").prop("disabled", true);
+						$("input[id^='product_id']").prop("required", true);
+					
+					}else{
+					toAppendProduct +='<tr id="head_hide"><th>Product name</th><th>Code</th><th>Model no</th><th>Serial no</th><th>Brand</th><th>Equipment no</th><th>Date of install</th></tr>';
+					$.each(response.product_details, function(i,o){
+						console.log(o.product_details);
+						date_of_install = '';
+						if (o.date_of_install != '0000-00-00')
+						{
+							date_of_install = o.date_of_install;
+						}
+						if(o.date_of_install == null)
+						{
+							date_of_install = '';
+						}      
+						code = '';
+						if (o.product_code != null) 
+						{
+							code = o.product_code;
+						}
+						equipment_no = '';
+						if (o.equipment_no != null) 
+						{
+							equipment_no = o.equipment_no;
+						}
+				toAppendProduct += '<tr><th scope="row"><div class="form-group"><div class="form-line"><input type="radio" name="product_id" id="product_id'+o.id+'" class="with-gap" value="'+o.id+'"><label for="product_id'+o.id+'">'+o.name+'</label></div></div></th><td>'+code+'</td><td>'+o.model_no+'</td><td>'+o.serial_no+'</td><td>'+o.brand+'</td><td>'+equipment_no+'</td><td>'+date_of_install+'</td></tr>';
+			});
 
-// alert(group_id);
+			
+			$('#product_details').html(toAppendProduct);
+			$('.auto_hide_product').show();
+			$('#product_details').show();
+			$('.cnt-submit').show();
+			$(".cnt-submit").prop("disabled", false);
+			$("input[id^='product_id']").prop("required", true);
+			$('#error_msg').hide();
+			}
 
-
-$.ajax({
-	type: "GET",
-	url: "{{ route('get-all-complaint-master-details.ajax') }}",
-	data: {
-		'group_id': group_id,
-		'client_id': client_id,
-		'branch': branch
-	},
-
-	success: function(response) {
-
-// console.log(response.complaint_master_details);
-
-if(response) {
-
-	var toAppend = '';
-	var toAppendProduct = '';
-
-
-    if (response.complaint_master_details.length) {
-
-        toAppend +='<option value="">All Complaint Masters</option>';
-        $.each(response.complaint_master_details, function(i,o){
-
-            console.log(o.complaint_details);
-
-            toAppend += '<option value="'+o.id+'" data-themeid="'+o.id+'">'+o.complaint_details+'</option>';
-        });
-
-        toAppend +='<option value="1">Not in the list</option>';
-
-        $('#complaint_master_id').html(toAppend);
-    }else{
-        $('#complaint_master_id').html("");
-        toAppend +='<option value="">All Complaint Masters</option>';
-        toAppend +='<option value="1">Not in the list</option>';
-        $('#complaint_master_id').html(toAppend);
-    }
-
-	if(!response.product_details.length){
-		$('#product_details').hide();
-		$('#error_msg').show();
-        // hide submit button here.
-        $('.cnt-submit').hide();
-        $(".cnt-submit").prop("disabled", true);
-        $("input[id^='product_id']").prop("required", true);
-       
-	}else{
-
-	toAppendProduct +='<tr id="head_hide"><th>Product name</th><th>Code</th><th>Model no</th><th>Serial no</th><th>Brand</th><th>Equipment no</th><th>Date of install</th></tr>';
-
-	$.each(response.product_details, function(i,o){
-
-		console.log(o.product_details);
-
-// toAppendProduct += '<tr><td>'+o.name+'</td><td>'+o.product_code+'</td><td>'+o.model_no+'</td><td>'+o.serial_no+'</td><td>'+o.brand+'</td>><td>'+o.equipment_no+'</td></tr>';
-
-		date_of_install = '';
-          if (o.date_of_install != '0000-00-00')
-          {
-            date_of_install = o.date_of_install;
-          }
-          if(o.date_of_install == null)
-          {
-            date_of_install = '';
-          }
-         
-          code = '';
-          if (o.product_code != null) 
-          {
-          	code = o.product_code;
-          }
-
-          equipment_no = '';
-          if (o.equipment_no != null) 
-          {
-          	equipment_no = o.equipment_no;
-          }
-
-
-toAppendProduct += '<tr><th scope="row"><div class="form-group"><div class="form-line"><input type="radio" name="product_id" id="product_id'+o.id+'" class="with-gap" value="'+o.id+'"><label for="product_id'+o.id+'">'+o.name+'</label></div></div></th><td>'+code+'</td><td>'+o.model_no+'</td><td>'+o.serial_no+'</td><td>'+o.brand+'</td><td>'+equipment_no+'</td><td>'+date_of_install+'</td></tr>';
-});
-
-	
-	$('#product_details').html(toAppendProduct);
-	$('.auto_hide_product').show();
-    $('#product_details').show();
-    $('.cnt-submit').show();
-    $(".cnt-submit").prop("disabled", false);
-    $("input[id^='product_id']").prop("required", true);
-    $('#error_msg').hide();
-	}
-
-}else{
-	alert("No complaint master found");
-}
-}
-});
+		}else{
+			alert("No complaint master found");
+		}
+		}
+		});
 });
 
 

@@ -209,7 +209,7 @@ class AssignClientController extends Controller
         $assign_p = Crypt::decrypt($client_id);
 
         // dd($assign_p);
-        $assign_product = AssignProductToClient::with('product','company','client')->where('client_id',$assign_p)->where('status',1)->get();
+        // $assign_product = AssignProductToClient::with('product','company','client')->where('client_id',$assign_p)->where('status',1)->get();
 
         $assign_client_name = Client::where('id',$assign_p)->where('status',1)->first();
 
@@ -219,6 +219,14 @@ class AssignClientController extends Controller
         $companies = Company::where('status',1)->get();
         $groups = Group::where('status',1)->get();
         $sgroups = SubGroup::where('status',1)->get();
+
+        $assign_product = AssignProductToClient::with('product','company','client')
+        ->where('client_id',$assign_p)
+        ->whereHas("product", function($query){
+            return $query->where("status", 1);
+        })
+        ->get();
+
 
         return view('admin.assign.client.edit',compact('assign_product','clients','companies','groups','sgroups','assign_client_name'));
         // dd($assign_product);
