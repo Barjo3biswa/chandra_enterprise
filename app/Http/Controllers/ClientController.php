@@ -125,6 +125,13 @@ class ClientController extends Controller
             return $query->where("status", 1);
          })
          ->get();
+
+        //  $assign_product = AssignProductToClient::with('product','company','client')
+        // ->where('client_id',$assign_p)
+        // ->whereHas("product", function($query){
+        //     return $query->where("status", 1);
+        // })
+        // ->get();
          return view('admin.client.show',compact('client','assign_product'));
     }
 

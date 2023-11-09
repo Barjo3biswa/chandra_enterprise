@@ -70,17 +70,17 @@ class LoginController extends Controller
                     Session::flash('success','You have successfully logged in');
                      return redirect()->intended($this->redirectPath()); 
                   }else{
-                    Session::flash('error','Please fix the error and try again');
+                    Session::flash('error','Please fix the error and try again1');
                     return redirect()->back();
                   }
 
             }else{
-                Session::flash('error','Please fix the error and try again');
+                Session::flash('error','Please fix the error and try again2');
                 return redirect()->back();  
             }
 
         }else{
-             Session::flash('error','Please fix the error and try again');
+             Session::flash('error','Please fix the error and try again3');
              return redirect()->back(); 
         }
 
