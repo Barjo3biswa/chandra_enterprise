@@ -1008,6 +1008,12 @@ Route::group(['prefix' => 'complaint-register'], function () {
         'uses' => 'ComplaintController@getBranchName'
     ]);
 
+    Route::get('/get-all-branch-new', [
+        'as' => 'get-all-branch-details-new.ajax',
+        'middleware' => ['auth'],
+        'uses' => 'ComplaintController@getBranchNameNew'
+    ]);
+
     Route::get('/get-contact-person-details', [
         'as' => 'get-contact-person-details.ajax',
         'middleware' => ['auth'],

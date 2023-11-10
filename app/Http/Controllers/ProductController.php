@@ -19,86 +19,82 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $products = Product::with(['assigned_product_to_client' => function($select_query){
-            return $select_query->select(["id", "product_id"]);
-        }, 'brand','group','company', "assigned_branch" => function($select_query){
-            return $select_query->select(["clients.id", "clients.name", "clients.branch_name"]);
-        }]);
+        // $products = Product::with(['assigned_product_to_client' => function($select_query){
+        //     return $select_query->select(["id", "product_id"]);
+        // }, 'brand','group','company', "assigned_branch" => function($select_query){
+        //     return $select_query->select(["clients.id", "clients.name", "clients.branch_name"]);
+        // }]);
+        $p_brands = Product::where('status',1)->where('brand','!=',null)->get();
+        $p_serial_no = Product::where('status',1)->where('serial_no','!=',null)->get();
+        $p_group = Product::with('group')->where('status',1)->where('group_id','!=',null)->get();
+        $p_company = Product::with('company')->where('status',1)->where('company_id','!=',null)->get();
+        $p_model_no = Product::where('status',1)->where('model_no','!=',null)->get();
+        $products = Product::with(['assigned_product_to_client', 'brand','group','company', "assigned_branch"]);
 
         if ($request->product_id) {
             $products=  $products->where("name","like",'%'.$request->product_id.'%');
         }
-
         if ($request->model_no) {
             $products=  $products->where("model_no","like",'%'.$request->model_no.'%');
         }
-
         if ($request->serial_no) {
             $products=  $products->where("serial_no","like",'%'.$request->serial_no.'%');
         }
-
         if ($request->product_code) {
             $products=  $products->where("product_code","like",'%'.$request->product_code.'%');
         }
-
         if ($request->group_id) {
             $grp_id = Group::where('name',$request->group_id)->where('status',1)->get();
             foreach ($grp_id as $key => $value) {
               $products=  $products->where("group_id","like",'%'.$value->id.'%');
             }
         }
-
         if ($request->company_id) {
             $products=  $products->where("company_id","like",'%'.$request->company_id.'%');
         }
-
         if ($request->brand) {
             $products=  $products->where("brand","like",'%'.$request->brand.'%');
         }
-
         if ($request->date_of_purchase) {
-
             $req_date1 = $request->input('date_of_purchase');
             $tdr1 = str_replace("/", "-", $req_date1);
             $new_exp_dt = date('Y-m-d',strtotime($tdr1));
-
-
             $products=  $products->where("date_of_purchase","like",'%'.$new_exp_dt.'%');
         }
-
         if ($request->manufacture_date) {
             $req_date = $request->input('manufacture_date');
             $tdr = str_replace("/", "-", $req_date);
             $new_mnf_dt = date('Y-m-d',strtotime($tdr));
-
             $products=  $products->where("manufacture_date","like",'%'.$new_mnf_dt.'%');
-
-            // dd($products);
         }
+
+        if($request->product_status){
+            $products    = $products->where('status', $request->product_status);
+        }
+       
+        if($request->product_assigned_status=="Yes"){
+            // dd("ok");
+            $products    = $products->whereHas('newAssigtnedBranch');
+        }else if($request->product_assigned_status=="No"){
+            $products    = $products->whereDoesntHave('newAssigtnedBranch');
+        }
+        // dd()
+
         $products->orderBy("name", "ASC");
-        // dd($products);
-        if($request->get("deactivated_product") == 1){
-            $products    = $products->where('status', 2);
-        }else{
-            $products = $products->where('status', 1);
+        if(!$request->product_status){
+            if($request->get("deactivated_product") == 1){
+                $products    = $products->where('status', 2);
+            }else{
+                $products = $products->where('status', 1);
+            }
         }
-
+        $p_count = $products->count();
         $products = $products->orderBy('id','desc')->paginate(200);
 
-        $p_brands = Product::where('status',1)->where('brand','!=',null)->get();
-        $p_serial_no = Product::where('status',1)->where('serial_no','!=',null)->get();
-        $p_group = Product::with('group')->where('status',1)->where('group_id','!=',null)->get();
-        $p_company = Product::with('company')->where('status',1)->where('company_id','!=',null)->get();
-        $p_model_no = Product::where('status',1)->where('model_no','!=',null)->get();
-        
-        return view('admin.product.index',compact('products','p_brands','p_serial_no','p_group','p_company','p_model_no'));
+        return view('admin.product.index',compact('products','p_brands','p_serial_no','p_group','p_company','p_model_no','p_count'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function create()
     {
         $brands = Brand::where('status',1)->get();
@@ -107,43 +103,30 @@ class ProductController extends Controller
         return view('admin.product.create',compact('brands','groups','companies'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function store(Request $request)
     {
        try
       {
          $rules = [
-
             'name'                                  => 'required',
         ];
-
          $messages = [
             'name.required'                         => 'Product name is required',
-        ];
-         
+        ];       
             $validator = Validator::make($request->all(), $rules, $messages);
-
             if ($validator->fails()) {
                 Session::flash('error', 'Please fix the error and try again!');
                 return redirect()->back()->withErrors($validator)->withInput();
             }
-
             $data = $request->all();
-
             $code = DB::table('products')->max('unique_no');
-
             if($code==0){
                 $code=1000;
             }else{
                 $code= $code+1; 
             }
             $data['unique_no'] = $code;
-
             if($request->input('manufacture_date') != ''){
                 $req_date = $request->input('manufacture_date');
                 $tdr = str_replace("/", "-", $req_date);
@@ -151,17 +134,16 @@ class ProductController extends Controller
             }
             else
             $new_mnf_dt = " ";
-
             $data['manufacture_date'] =  $new_mnf_dt;
-
-           if($request->input('date_of_purchase') != ''){
-            $req_date1 = $request->input('date_of_purchase');
-            $tdr1 = str_replace("/", "-", $req_date1);
-            $new_exp_dt = date('Y-m-d',strtotime($tdr1));
+            if($request->input('date_of_purchase') != ''){
+                $req_date1 = $request->input('date_of_purchase');
+                $tdr1 = str_replace("/", "-", $req_date1);
+                $new_exp_dt = date('Y-m-d',strtotime($tdr1));
             }
-            else
-              $new_exp_dt = "";  
-
+            else{
+                $new_exp_dt = "";  
+            }
+              
             $data['date_of_purchase'] =  $new_exp_dt;
             $data['product_code'] = strtoupper($request->product_code);
         
@@ -171,17 +153,11 @@ class ProductController extends Controller
             {
                 return Redirect::back();
             }
-
         Session::flash('success','Successfully added product deatils');
         return redirect()->route('view-all-product');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function show($id)
     {
         try {
@@ -194,12 +170,7 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function edit($id)
     {
         $p_id = Crypt::decrypt($id);
@@ -211,53 +182,38 @@ class ProductController extends Controller
         return view('admin.product.edit',compact('product','brands','groups','companies','sgroups'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
+
+
     public function update(Request $request, $id)
     {
        try
           {
              $p_id = Crypt::decrypt($id);
              $product = Product::where('id',$p_id)->where('status',1)->first();
-
              $rules = [
-
                 'name'                                  => 'required',
              ];
-
              $messages = [
                 'name.required'                         => 'Product name is required',
-             ];
-         
+             ];       
             $validator = Validator::make($request->all(), $rules, $messages);
-
             if ($validator->fails()) {
                 Session::flash('error', 'Please fix the error and try again!');
                 return redirect()->back()->withErrors($validator)->withInput();
             }
-
             $product->name                      = $request->name;
             $product->product_code              = $request->product_code;
-
-
             if($request->date_of_purchase != ''){
-            $req_date1 = $request->date_of_purchase;
-            $tdr1 = str_replace("/", "-", $req_date1);
-            $new_exp_dt = date('Y-m-d',strtotime($tdr1));
+                $req_date1 = $request->date_of_purchase;
+                $tdr1 = str_replace("/", "-", $req_date1);
+                $new_exp_dt = date('Y-m-d',strtotime($tdr1));
             }
-            else
-              $new_exp_dt = "";  
-
+            else{
+                $new_exp_dt = "";  
+            }           
             $product->date_of_purchase =  $new_exp_dt;
-
-
-            $product->serial_no                 = $request->serial_no;
-
+            $product->serial_no = $request->serial_no;
             if($request->manufacture_date != ''){
                 $req_date = $request->manufacture_date;
                 $tdr = str_replace("/", "-", $req_date);
@@ -265,10 +221,7 @@ class ProductController extends Controller
             }
             else
             $new_mnf_dt = " ";
-
             $product->manufacture_date =  $new_mnf_dt;
-
-
             $product->warranty                  = $request->warranty;
             $product->brand                  = $request->brand;
             $product->model_no                  = $request->model_no;
@@ -280,10 +233,9 @@ class ProductController extends Controller
             $product->product_code              = strtoupper($request->product_code);
             $product->save();
 
-      }catch(ValidationException $e)
-            {
-                return Redirect::back();
-            }
+        }catch(ValidationException $e){
+            return Redirect::back();
+        }
 
         Session::flash('success','Successfully updated product deatils');
         return redirect()->route('view-all-product');
@@ -386,13 +338,9 @@ class ProductController extends Controller
              return response()->json($acheads);
         }
     }
-    
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
+
+
     public function destroy($id)
     {
         try {
@@ -409,12 +357,8 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
+
     public function deactivateProduct($id)
     {
         $product_id = Crypt::decrypt($id);
@@ -426,12 +370,8 @@ class ProductController extends Controller
         return Redirect::route('view-all-product');
     }
 
-    /**
-     * Active Product
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
+
     public function activateProduct($id)
     {
         $product_id = Crypt::decrypt($id);
@@ -442,6 +382,9 @@ class ProductController extends Controller
         Session::flash('success', 'Successfully Activated Product Details.');
         return Redirect::route('view-all-product');
     }
+
+
+
     public function ajaxProductList(Request $request)
     {
         $products = Product::query();

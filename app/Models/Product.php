@@ -60,4 +60,8 @@ class Product extends Model
 			'client_id' // Local key on AssignProductToClient table...
 		);
 	}
+
+	public function newAssigtnedBranch(){
+		return $this->hasOne(AssignProductToClient::class, 'product_id', 'id')->where('status',1);
+	}
 }

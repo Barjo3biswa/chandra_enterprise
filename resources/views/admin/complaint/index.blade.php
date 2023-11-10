@@ -7,15 +7,9 @@
    .font_blue {
     color: #00BCD4;
     } 
-
    .font_green {
     color: #2B982B;
    } 
-
-   /*.font_lime {
-    color: #CDDC39;
-   }*/
-
    .card .header .header-dropdown .bg_blue {
     color: #00BCD4!important;
    }
@@ -39,7 +33,7 @@
         <div class="card">
             <div class="header">
                 <h2>
-                    Complaints
+                    Complaints <small>({{$results->count()}}Records found)</small>
                 </h2>
                 <ul class="header-dropdown m-r--5">
 
@@ -176,7 +170,7 @@
       <div class="modal-body">
         <div class="row">
             <div class="col-md-3">
-                 <div class="form-group form-float">
+                <div class="form-group form-float">
                     <div class="form-line">
                         <select class="form-control show-tick" name="client_id" id="client_id">
                            <option value="">-- Please select client --</option>
@@ -190,7 +184,7 @@
             </div>
 
             <div class="col-md-3">
-                 <div class="form-group form-float">
+                <div class="form-group form-float">
                     <div class="form-line">
                         <input type="text" list="options_branch" class="form-control" name="branch" id="branch" value="{{ old('branch') }}" autocomplete="off">
                         <label class="form-label">Branch name</label>

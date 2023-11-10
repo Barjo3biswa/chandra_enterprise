@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Models\Assign\AssignProductToClient;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ClientAmcMaster;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Client extends Model
 {
@@ -41,6 +43,10 @@ class Client extends Model
 	}
 	public function amc_active() {
 		return $this->hasMany(ClientAmcMaster::class, "client_id", "id")->where("status", 1);
+	}
+
+	public function product(){
+		return $this->hasMany(AssignProductToClient::class, 'client_id', 'id')->where('status',1);
 	}
 
 }

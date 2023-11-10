@@ -18,8 +18,6 @@ class ComplaintController extends Controller
      */
     public function index(Request $request)
     {
-
-        // $complaints = Complaint::with('client')->where('status',1)->orderBy('id','desc')->get();
         $clients = Client::where('status',1)->groupBy('name')->get();
         $zones = Zone::where('status',1)->get();
         $groups = Group::where('status',1)->get();
@@ -29,86 +27,57 @@ class ComplaintController extends Controller
 
         $complaints = Complaint::with('client', 'group','product','comp_master','user', "assigned_engineers");
 
-        if($request->from_date) {
+            if($request->from_date) {
                 $complaints = $complaints->whereDate('complaint_entry_date', '>=', date('Y-m-d', strtotime($request->from_date)));
             }
-
             if($request->to_date) {
                 $complaints = $complaints->whereDate('complaint_entry_date', '<=', date('Y-m-d', strtotime($request->to_date)));
             }
-
             if($request->zone_id) {
-
                 $z_id = Client::where('zone_id',$request->zone_id)->first();
-
                 if($z_id){
                    $complaints = $complaints->where('client_id','like','%'.$z_id->id.'%'); 
-                }
-
-                
+                }                
             }
-
-           
             if($request->client_id) {
-
                 $client_names = Client::select('id')->where('name','like','%'.$request->client_id.'%')->where('status',1)->get()->toArray();
-                // dd($client_name);
                 $client = [];
                 foreach ($client_names as $key => $client_name) {
                     array_push($client, $client_name['id']);
                 }
-
-                foreach ($client_name as $key => $value) {
-                   
-                    $complaints = $complaints->whereIn('client_id',$client);
-                    
+                foreach ($client_name as $key => $value) {                
+                    $complaints = $complaints->whereIn('client_id',$client);               
                 }
-                // dd($complaints);
-
              }
-
-            
-
             if($request->branch) {
                 $branch = Client::where('branch_name','like','%'.$request->branch.'%')->first()->id;
 
                 $complaints = $complaints->where('client_id','like','%'.$branch.'%');
             }
-
             if($request->complaint_no) {
                 $complaints = $complaints->where('complaint_no','like','%'.$request->complaint_no.'%');
             }
-
             if($request->priority) {
                 $complaints = $complaints->where('priority','like','%'.$request->priority.'%');
             }
-
             if ($request->complaint_status) {
                 $complaints = $complaints->where('complaint_status','like','%'.$request->complaint_status.'%');
             }
-
             if($request->group_id) {
                 $complaints = $complaints->where('group_id','like','%'.$request->group_id.'%');
             }
-
             if($request->complaint_master_id) {
                 $complaints = $complaints->where('complaint_master_id','like','%'.$request->complaint_master_id.'%');
             }
-
             if($request->product_id) {
-
-                // dd($request->product_id);
                 $complaints = $complaints->where('product_id','like','%'.$request->product_id.'%');
             }
-
             if (Auth::user()->user_type == 1 || Auth::user()->user_type == 0) {
                 $results = $complaints->orderBy('complaint_entry_date', 'DESC')->where('status',1)->get();
             }
             if(Auth::user()->user_type == 3 || Auth::user()->user_type == 2){
                 $results = $complaints->where('assigned_to',Auth::user()->id)->where('complaint_status','!=',3)->orderBy('complaint_entry_date', 'DESC')->where('status',1)->get();
             }
-
-            // dd($results);
 
             
         return view('admin.complaint.index',compact('results','clients','zones','groups','c_masters','products'));
@@ -604,6 +573,20 @@ class ComplaintController extends Controller
        if($client_id){
 
         $branchname = Client::where('name',$client_id)->where('status',1)->get();
+        return response()->json($branchname);
+
+       }
+        
+    }
+
+    public function getBranchNameNew(Request $request)
+    {
+       $client_id = $request->input('client_id');
+       if($client_id){
+
+        $branchname = Client::where('name',$client_id)->where('status',1)
+                            ->whereHas('product')
+                            ->get();
         return response()->json($branchname);
 
        }

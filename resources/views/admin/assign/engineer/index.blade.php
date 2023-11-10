@@ -18,7 +18,7 @@
         <div class="card">
             <div class="header">
                 <h2>
-                    Assign Client To Engineer
+                    Assign Client To Engineer <small>({{$assign_engineers->count()}} Records found)</small>
                 </h2>
                 <ul class="header-dropdown m-r--5">
 
@@ -67,15 +67,15 @@
                                     <div class="btn-group">
                                         
                                         @if(Auth::user()->can('edit assign-engineer'))
-                                        <a href="{{ route('edit-assign-new-client-to-engineer', Crypt::encrypt($aeng->engineer_id)) }}" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit"><i class="fa fa-edit"></i></a>
+                                        <a href="{{ route('edit-assign-new-client-to-engineer', Crypt::encrypt($aeng->engineer_id)) }}" class="btn btn-xs btn-warning" data-toggle="tooltip" title="Edit"><i class="fa fa-edit"></i></a>
                                         @endif
                                        
 
-                                        <a href="{{ route('show-assign-new-client-to-engineer', Crypt::encrypt($aeng->engineer_id)) }}" class="btn btn-sm btn-info" data-toggle="tooltip" title="Details"><i class="fa fa-eye"></i></a>
+                                        <a href="{{ route('show-assign-new-client-to-engineer', Crypt::encrypt($aeng->engineer_id)) }}" class="btn btn-xs btn-info" data-toggle="tooltip" title="Details"><i class="fa fa-eye"></i></a>
                                      
                                         
                                         @if(Auth::user()->can('delete assign-engineer'))
-                                        <a href="{{ route('destroy-assign-new-client-to-engineer', Crypt::encrypt($aeng->engineer_id)) }}" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure')"><i class="fa fa-trash"></i></a>
+                                        <a href="{{ route('destroy-assign-new-client-to-engineer', Crypt::encrypt($aeng->engineer_id)) }}" class="btn btn-xs btn-danger" data-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure')"><i class="fa fa-trash"></i></a>
                                         @endif
                                         
                                     </div>

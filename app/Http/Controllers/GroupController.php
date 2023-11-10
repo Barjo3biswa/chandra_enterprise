@@ -19,6 +19,7 @@ class GroupController extends Controller
      */
     public function index()
     {
+        // dd('ok');
         $groups = Group::where('status',1)->orderBy('id','desc')->get();
         return view('admin.group.index',compact('groups'));
     }

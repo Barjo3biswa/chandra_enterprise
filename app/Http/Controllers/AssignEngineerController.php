@@ -24,65 +24,44 @@ class AssignEngineerController extends Controller
         $assign_engineers = AssignEngineer::with('user','client')->where('status',1);
 
         if ($request->client_id) {
-
-            $client_names = Client::select('id')->where('name','like','%'.$request->client_id.'%')->where('status',1)->get()->toArray();
-                
+            $client_names = Client::select('id')->where('name','like','%'.$request->client_id.'%')->where('status',1)->get()->toArray();            
             $clients1 = [];
             foreach ($client_names as $key => $client_name) {
                 array_push($clients1, $client_name['id']);
             }
-
-            $assign_engineers = $assign_engineers->whereIn('client_id',$clients1);
-                
+            $assign_engineers = $assign_engineers->whereIn('client_id',$clients1);        
         }
 
         if ($request->branch) {
-
-            $client_names = Client::select('id')->where('branch_name','like','%'.$request->branch.'%')->where('status',1)->get()->toArray();
-                
+            $client_names = Client::select('id')->where('branch_name','like','%'.$request->branch.'%')->where('status',1)->get()->toArray();       
             $clients2 = [];
             foreach ($client_names as $key => $client_name) {
                 array_push($clients2, $client_name['id']);
             }
-     
-            $assign_engineers = $assign_engineers->whereIn('client_id',$clients2);
-                
+            $assign_engineers = $assign_engineers->whereIn('client_id',$clients2);        
          }
 
         if ($request->company_id) {
-
             $client_companies = Product::where('company_id',$request->company_id)->where('isAssigned',1)->select('id')->get()->toArray();
-
             $products_assign = [];
             foreach ($client_companies as $key => $client_company) {
                 array_push($products_assign, $client_company['id']);
             }
-
             $check_assign_products = AssignProductToClient::whereIn('product_id',$products_assign)->where('status',1)->select('client_id')->get()->toArray();
-
             $assign_clients = [];
             foreach ($check_assign_products as $key => $check_assign_product) {
                 array_push($assign_clients, $check_assign_product['client_id']);
             }
-
-            // dd($check_assign_product);
-
            $assign_engineers = $assign_engineers->whereIn('client_id',$assign_clients);
         }
-
         if ($request->engineer_id) {
            $assign_engineers =  $assign_engineers->where("engineer_id","like",'%'.$request->engineer_id.'%');
         }
-
         if ($request->zone_id) {
            $assign_engineers =  $assign_engineers->where("zone_id",$request->zone_id);
         }
 
-        // dd($request->zone_id);
-
         $assign_engineers = $assign_engineers->groupBy('engineer_id')->get();
-
-        // dd($assign_engineers);
 
         return view('admin.assign.engineer.index',compact('assign_engineers','clients', 'branches','engineers','companies','zones'));
     }
@@ -165,15 +144,11 @@ class AssignEngineerController extends Controller
  
         $assign_eng = AssignEngineer::with('user','client','client.assigned_products')->where('engineer_id',$aseng_id)->get();
        
-        return view('admin.assign.engineer.show',compact('assign_eng','assign_client_details','assign_eng_name'));
+        return view('admin.assign.engineer.show',compact('assign_eng','assign_eng_name'));
     }
+    
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function edit($engineer_id)
     {
         $clients = Client::where('status',1)->get();

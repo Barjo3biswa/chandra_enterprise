@@ -17,7 +17,7 @@
         <div class="card">
             <div class="header">
                 <h2>
-                    Assign Product To Client
+                    Assign Product To Client <small>({{$assign_clients->count()}} Records found)</small>
                 </h2>
                 <ul class="header-dropdown m-r--5">
 
@@ -66,15 +66,15 @@
                                     <div class="btn-group">
                                         
                                         @if(Auth::user()->can('edit assign-product-to-client'))
-                                        <a href="{{ route('edit-assign-new-product-to-client', Crypt::encrypt($ac->client_id)) }}" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit"><i class="fa fa-edit"></i></a>
+                                        <a href="{{ route('edit-assign-new-product-to-client', Crypt::encrypt($ac->client_id)) }}" class="btn btn-xs btn-warning" data-toggle="tooltip" title="Edit"><i class="fa fa-edit"></i></a>
                                         @endif
                                        
 
-                                        <a href="{{ route('show-assign-new-product-to-client', Crypt::encrypt($ac->client_id)) }}" class="btn btn-sm btn-info" data-toggle="tooltip" title="Details"><i class="fa fa-eye"></i></a>
+                                        <a href="{{ route('show-assign-new-product-to-client', Crypt::encrypt($ac->client_id)) }}" class="btn btn-xs btn-info" data-toggle="tooltip" title="Details"><i class="fa fa-eye"></i></a>
                                      
                                         
                                         @if(Auth::user()->can('delete assign-product-to-client'))
-                                        <a href="{{ route('destroy-assign-new-product-to-client', Crypt::encrypt($ac->client_id)) }}" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure')"><i class="fa fa-trash"></i></a>
+                                        <a href="{{ route('destroy-assign-new-product-to-client', Crypt::encrypt($ac->client_id)) }}" class="btn btn-xs btn-danger" data-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure')" ><i class="fa fa-trash"></i></a>
                                         @endif
                                         
                                     </div>
@@ -192,7 +192,7 @@
 <script src="{!!asset('assets/js/jquery-datatable.js')!!}"></script>
 <script>
     $('.js-basic-example').DataTable({
-        pageLength: 50,
+        pageLength: 100,
         responsive: true
         
     });
@@ -205,7 +205,7 @@
                 url: URL,
                 dataType: 'json',
                 type: "GET",
-                quietMillis: 50,
+                quietMillis: 100,
                 data: function (term) {
                     return {
                         "product_name": term.term

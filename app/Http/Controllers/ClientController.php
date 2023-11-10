@@ -20,34 +20,40 @@ class ClientController extends Controller
      */
     public function index(Request $request)
     {
-        $clients = Client::with('zone','region')->where('status',1);
+        $c_group_by = Client::with('zone','region')->where('status',1)->groupBy('name')->get();
+        $zones = Zone::where('status',1)->get();
+        $regions = Region::where('status',1)->get();
 
+        $clients = Client::with('zone','region')->where('status',1);
         if ($request->client_id) {
            $clients=  $clients->where("name","like",'%'.$request->client_id.'%');
         }
-
         if ($request->branch) {
            $clients=  $clients->where("branch_name","like",'%'.$request->branch.'%');
         }
-
         if ($request->zone_id) {
             $clients=  $clients->where("zone_id",$request->zone_id);
         }
-
         if ($request->region_id) {
             $clients=  $clients->where("region_id",$request->region_id);
         }
 
+        if($request->product_assigned=='Yes'){
+            $clients=  $clients->whereHas('assigned_products');
+        }else if($request->product_assigned=='No'){
+            $clients=  $clients->whereDoesntHave('assigned_products');
+        }
+
         $clients = $clients->orderBy('id','desc')->get();
+
         $all_clients = Client::orderBy('id','desc')->where('status',1)->get();
+
         $all_branches = $all_clients->map(function($item){
             return $item->branch_name;
         });
         $all_branches = $all_branches->toArray();
         asort($all_branches);
-        $c_group_by = Client::with('zone','region')->where('status',1)->groupBy('name')->get();
-        $zones = Zone::where('status',1)->get();
-        $regions = Region::where('status',1)->get();
+
         return view('admin.client.index',compact('clients','c_group_by','zones','regions', 'all_clients', 'all_branches'));
     }
 
@@ -124,6 +130,7 @@ class ClientController extends Controller
          ->whereHas("product", function($query){
             return $query->where("status", 1);
          })
+         ->where('status',1)
          ->get();
 
         //  $assign_product = AssignProductToClient::with('product','company','client')

@@ -9,97 +9,62 @@ use Session, Crypt, Excel, Redirect;
 
 class AssignClientController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index(Request $request)
     {
         $clients = Client::where('status',1)->groupBy('name')->get();
         $companies = Company::where('status',1)->get();
         $groups = Group::where('status',1)->get();
         $assign_client_branch = AssignProductToClient::with('product','company','client')->where('status',1)->select('client_id')->get()->toArray();
-// dd($assign_client_branch);
-        $assign_clients = AssignProductToClient::with('product','company','client')->where('status',1);
-
+        
+        $assign_clients = AssignProductToClient::with('product','company','client')
+                                                ->where('status',1)
+                                                ->whereHas('client')
+                                                ->whereHas('product');
         if ($request->client_id) {
-
-            $client_names = Client::select('id')->where('name','like','%'.$request->client_id.'%')->where('status',1)->get()->toArray();
-                
+            $client_names = Client::select('id')->where('name','like','%'.$request->client_id.'%')->where('status',1)->get()->toArray();   
             $clients1 = [];
             foreach ($client_names as $key => $client_name) {
                 array_push($clients1, $client_name['id']);
             }
-
-            //dd($clients);
-            //foreach ($client_name as $key => $value) {
-               
-                $assign_clients = $assign_clients->whereIn('client_id',$clients1);
-                
-            //}
-     
+            $assign_clients = $assign_clients->whereIn('client_id',$clients1);
         }
 
         if ($request->branch) {
-
-            $client_names = Client::select('id')->where('branch_name','like','%'.$request->branch.'%')->where('status',1)->get()->toArray();
-                
+            $client_names = Client::select('id')->where('branch_name','like','%'.$request->branch.'%')->where('status',1)->get()->toArray();   
             $clients2 = [];
             foreach ($client_names as $key => $client_name) {
                 array_push($clients2, $client_name['id']);
             }
-
-            //dd($clients);
-            //foreach ($client_name as $key => $value) {
-               
-                $assign_clients = $assign_clients->whereIn('client_id',$clients2);
-                
-            //}
-     
+            $assign_clients = $assign_clients->whereIn('client_id',$clients2);
         }
 
         if ($request->company_id) {
            $assign_clients=  $assign_clients->where("company_id","like",'%'.$request->company_id.'%');
         }
 
-
         if ($request->group_id) {
             $client_groups = Product::where('group_id',$request->group_id)->select('id')->get()->toArray();
-
             $products_assign = [];
             foreach ($client_groups as $key => $client_group) {
                 array_push($products_assign, $client_group['id']);
-            }
-
-            //dd($clients);
-            //foreach ($client_group as $key => $value) {
-               
+            }   
                 $assign_clients = $assign_clients->whereIn('product_id',$products_assign);
-                
-            //}
-
         }
 
-        // dd($client_groups);
         $assign_clients->when($request->get("product_id"), function($query) use ($request){
             return $query->whereHas("product", function($sub_query) use ($request){
                 return $sub_query->where("id", $request->get("product_id"));
             });
         });
         $assign_clients = $assign_clients->groupBy('client_id')->get();
-
-        //dd($assign_clients);
         $client_branches = Client::select("branch_name")->distinct("branch_name")->orderBy("branch_name")->pluck("branch_name", "branch_name")->toArray();
-
         return view('admin.assign.client.index',compact('assign_clients','clients','companies','groups', "client_branches"));
     }
+    
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
+
     public function create()
     {
         $clients = Client::where('status',1)->groupBy('name')->get();
@@ -190,12 +155,11 @@ class AssignClientController extends Controller
        
         $assign_product = AssignProductToClient::with('product','company','client')
         ->where('client_id',$assign_p)
-        ->whereHas("product", function($query){
-            return $query->where("status", 1);
-        })
+        ->whereHas("product")
+        ->where('status',1)
         ->get();
-  
-        return view('admin.assign.client.show',compact('assign_product','assign_product_detail','client_name'));
+        
+        return view('admin.assign.client.show',compact('assign_product','client_name'));
     }
 
     /**
@@ -207,14 +171,7 @@ class AssignClientController extends Controller
     public function edit($client_id)
     {
         $assign_p = Crypt::decrypt($client_id);
-
-        // dd($assign_p);
-        // $assign_product = AssignProductToClient::with('product','company','client')->where('client_id',$assign_p)->where('status',1)->get();
-
         $assign_client_name = Client::where('id',$assign_p)->where('status',1)->first();
-
-        // dd($assign_client_name);
-
         $clients = Client::where('status',1)->get();
         $companies = Company::where('status',1)->get();
         $groups = Group::where('status',1)->get();
@@ -222,34 +179,22 @@ class AssignClientController extends Controller
 
         $assign_product = AssignProductToClient::with('product','company','client')
         ->where('client_id',$assign_p)
-        ->whereHas("product", function($query){
-            return $query->where("status", 1);
-        })
+        ->whereHas("product")
+        ->where('status',1)
         ->get();
-
-
         return view('admin.assign.client.edit',compact('assign_product','clients','companies','groups','sgroups','assign_client_name'));
-        // dd($assign_product);
     }
+    
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
+
     public function update(Request $request, $id)
     {
         //
     }
+    
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function destroy($client_id)
     {
         $assign_p = Crypt::decrypt($client_id);

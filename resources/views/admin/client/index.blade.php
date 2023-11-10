@@ -12,8 +12,29 @@
         <div class="card">
             <div class="header">
                 <h2>
-                    Clients
+                    Clients  <small>({{$clients->count()}}Records Found)</small>
                 </h2>
+                <form>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group form-float">
+                                <div class="form-line">           
+                                    <h6>Product Status</h6>
+                                    <select name="product_assigned" class="form-control">
+                                        <option value="">--Select--</option>
+                                        <option value="Yes" {{request()->get('product_assigned')=='Yes'?'selected':''}}>Product Assigned</option>
+                                        <option value="No" {{request()->get('product_assigned')=='No'?'selected':''}}>Product Not Assigned</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>   
+                        <div class="col-md-3">
+                            <input type="submit" class="btn btn-primary btn-xs" value="Find">
+                        </div>                               
+                    </div>
+                    
+                </form>
+
                 <ul class="header-dropdown m-r--5">
 
                     <li>

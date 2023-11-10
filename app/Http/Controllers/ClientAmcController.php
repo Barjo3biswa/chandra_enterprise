@@ -21,42 +21,30 @@ class ClientAmcController extends Controller
      */
     public function index(Request $request)
     {
-        // dump(getDuration(25));
-        // dd("halt here");
         $clients = Client::where('status',1)->get();
         $c_group_by = Client::where('status',1)->groupBy('name')->get();
         $rosters = RosterMaster::where('status',1)->get();
         $client_amcs = ClientAmcMaster::with('client.zone','roster')->where('status',1);
         $zones = Zone::whereStatus(1)->pluck("name", "id")->toArray();
         if ($request->client_id) {
-
             $client_names = Client::select('id')->where('name','like','%'.$request->client_id.'%')->where('status',1)->get()->toArray();
-                
             $clients = [];
             foreach ($client_names as $key => $client_name) {
                 array_push($clients, $client_name['id']);
             }
-
-            foreach ($client_name as $key => $value) {
-               
-                $client_amcs = $client_amcs->whereIn('client_id',$clients);
-                
+            foreach ($client_name as $key => $value) {    
+                $client_amcs = $client_amcs->whereIn('client_id',$clients);  
             }
-     
         }
-
         if ($request->financial_year) {
            $client_amcs=  $client_amcs->where("financial_year","like",'%'.$request->financial_year.'%');
         }
-
         if ($request->roster_id) {
            $client_amcs=  $client_amcs->where("roster_id","like",'%'.$request->roster_id.'%');
         }
-
         if ($request->amc_start_date) {
            $client_amcs=  $client_amcs->where("amc_start_date","like",'%'.$request->amc_start_date.'%');
         }
-
         if ($request->amc_end_date) {
            $client_amcs=  $client_amcs->where("amc_end_date","like",'%'.$request->amc_end_date.'%');
         }
@@ -68,27 +56,19 @@ class ClientAmcController extends Controller
             });
         });
         $client_amcs = $client_amcs->orderBy('id','desc')->get();
-        // dd($client_amcs);
-         
         return view('admin.amc.index',compact('client_amcs','clients','c_group_by','rosters', 'zones'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    
+
+
     public function create()
     {
-        // dd("ok");
         $zones = Zone::where('status',1)->get();
         foreach ($zones as $key => $value) {
             $clients = Client::where('zone_id',$value->id)->where('status',1)->groupBy('name')->get();
         }
-
-
         $rosters = RosterMaster::where('status',1)->get();
-        
         return view('admin.amc.create',compact('zones','clients','rosters'));
     }
 
@@ -605,7 +585,8 @@ class ClientAmcController extends Controller
        $client_id = $request->input('client_id');
        if($client_id){
 
-        $branchname = Client::where('name',$client_id)->where('status',1)->get();
+        $branchname = Client::where('name',$client_id)->where('status',1)
+                                ->whereHas('product')->get();
         return response()->json($branchname);
 
        }

@@ -21,24 +21,55 @@
         <div class="card">
             <div class="header">
                 <h2>
-                    Product <small>{!!request()->get('deactivated_product') == 1 ? "Deactivated" : ""!!}</small>
+                    Product <small>({{$p_count}} Records Found){!!request()->get('deactivated_product') == 1 ? "Deactivated" : ""!!}</small>
                 </h2>
+                <form>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group form-float">
+                                <div class="form-line">
+                                    <h6>Product Status</h6>                            
+                                    <select name="product_status" id="">
+                                        <option value="">--select--</option>
+                                        <option value="1" {{ Request()->get('product_status') == 1 ? 'selected' : '' }}>Active</option>
+                                        <option value="2" {{ Request()->get('product_status') == 2 ? 'selected' : '' }}>Deactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group form-float">
+                                <div class="form-line">
+                                    <h6>Product Assigned Status</h6>                            
+                                    <select name="product_assigned_status" id="">
+                                        <option value="">--select--</option>
+                                        <option value="Yes" {{Request()->get('product_assigned_status')=='Yes'?'selected':''}}>Assigned</option>
+                                        <option value="No" {{Request()->get('product_assigned_status')=='No'?'selected':''}}>Not Assigned</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="submit" class="btn btn-primary btn-xs" value="Find">
+                        </div>
+                    </div>
+                </form>
                 <ul class="header-dropdown m-r--5">
-
+                    
                     <li>
                         <button type="button"  data-toggle="modal" data-target="#myModal" data-backdrop="static" data-keyboard="false" class="btn bg-blue waves-effect"><i class="fa fa-filter"></i>
                         Filter </button>
                     </li>
-                    @if(!request()->get('deactivated_product'))
+                    {{-- @if(!request()->get('deactivated_product'))
                         <li>
                             <a href="{{ request()->fullUrlWithQuery(["deactivated_product" => 1]) }}" class="btn btn-danger waves-effect"> <i class="fa fa-list-alt" aria-hidden="true"></i> Deactivated Products </a>
                         </li>
                     @else
                         <li>
-                            <a href="{{ request()->url() }}" class="btn btn-success waves-effect"> <i class="fa fa-list-alt" aria-hidden="true"></i> All Products </a>
+                            <a href="{{ request()->url() }}" class="btn btn-success waves-effect"> <i class="fa fa-list-alt" aria-hidden="true"></i> All Products(Active) </a>
                         </li>
+                    @endif --}}
 
-                    @endif
                     <li><a href="{{ route('product-details.excel') }}" class="btn bg-brown waves-effect"> <i class="fa fa-download" aria-hidden="true"></i> Export to Excel </a></li>
 
                     @if(Auth::user()->can('add product'))
@@ -81,7 +112,7 @@
                             @foreach($products as $k => $product)
                             <tr>
                                 <td>{{ (($products->currentPage() - 1 ) * $products->perPage() ) + ($k +1) }}</td>
-                                <td>{{ ucwords($product->name) }}</td>
+                                <td>{{ ucwords($product->name) }} {{$product->id}}</td>
                                 <td>
                                     {{ $product->product_code }}
                                 </td>
@@ -89,37 +120,43 @@
                                 <td>{{ $product->brand }}</td>
                                 <td>{{ $product->model_no }}</td>
                                 <td>{{ $product->equipment_no }}</td>
-                                @php
+                                {{-- @php
                                     $branches = $product->assigned_branch->map(function($item){
                                         return $item->name."-".$item->branch_name;
                                     })->toArray();
-                                @endphp
-                                <td>{{ ($branches ? implode(",", $branches) : "Not Assigned") }}</td>
+                                @endphp 
+                                <td>{{ ($branches ? implode(",", $branches) : "Not Assigned") }}</td>--}}
+
+                                <td>
+                                    {{$product->newAssigtnedBranch->client->name??"Not Assigned"}}
+                                    {{$product->newAssigtnedBranch->client->branch_name??"NA"}}
+                                </td>
+
                                 <td>
                                     <div class="btn-group">
                                         @if(Auth::user()->can('edit product'))
-                                        <a href="{{ route('edit-product',Crypt::encrypt($product->id)) }}" class="btn btn-sm btn-warning" data-toggle="tooltip" data-container="body" title="Edit"><i class="fa fa-edit"></i></a>
+                                        <a href="{{ route('edit-product',Crypt::encrypt($product->id)) }}" class="btn btn-xs btn-warning" data-toggle="tooltip" data-container="body" title="Edit"><i class="fa fa-edit"></i></a>
                                         @endif
 
-                                        <a href="{{ route('show-product',Crypt::encrypt($product->id)) }}" class="btn btn-sm btn-info" data-toggle="tooltip" data-container="body" title="Details"><i class="fa fa-eye"></i></a>
+                                        <a href="{{ route('show-product',Crypt::encrypt($product->id)) }}" class="btn btn-xs btn-info" data-toggle="tooltip" data-container="body" title="Details"><i class="fa fa-eye"></i></a>
 
                                         {{-- @if(Auth::user()->can('delete product'))
-                                        <a href="{{ route('destroy-product',Crypt::encrypt($product->id)) }}" class="btn btn-sm btn-danger" data-toggle="tooltip" data-container="body" title="Delete" onclick="return confirm('Are you sure')"><i class="fa fa-trash"></i></a>
+                                        <a href="{{ route('destroy-product',Crypt::encrypt($product->id)) }}" class="btn btn-xs btn-danger" data-toggle="tooltip" data-container="body" title="Delete" onclick="return confirm('Are you sure')"><i class="fa fa-trash"></i></a>
                                         @endif --}}
                                         @if($product->status == 2)
                                             @if(Auth::user()->can('delete product'))
-                                            <a href="{{ route('activate-product', Crypt::encrypt($product->id)) }}" class="btn btn-sm btn-success" data-toggle="tooltip"   data-container="body" title="Activate product" onclick="return confirm('Are you sure')"><i class="fa fa-check"></i></a>
+                                            <a href="{{ route('activate-product', Crypt::encrypt($product->id)) }}" class="btn btn-xs btn-success" data-toggle="tooltip"   data-container="body" title="Activate product" onclick="return confirm('Are you sure')"><i class="fa fa-check"></i></a>
                                             @endif
                                             @if(Auth::user()->can('delete product'))
-                                            <a href="{{ route('destroy-product',Crypt::encrypt($product->id)) }}" class="btn btn-sm btn-danger" data-toggle="tooltip"  data-container="body" title="Delete product" onclick="return confirm('Are you sure')"><i class="fa fa-trash-o"></i></a>
+                                            <a href="{{ route('destroy-product',Crypt::encrypt($product->id)) }}" class="btn btn-xs btn-danger" data-toggle="tooltip"  data-container="body" title="Delete product" onclick="return confirm('Are you sure')"><i class="fa fa-trash-o"></i></a>
                                             @endif
                                         @elseif($product->status == 1)                                       
                                             @if(Auth::user()->can('delete product'))
-                                            <a href="{{ route('deactivate-product',Crypt::encrypt($product->id)) }}" class="btn btn-sm btn-danger" data-toggle="tooltip"  data-container="body" title="Deactivate product" onclick="return confirm('Are you sure')"><i class="fa fa-times"></i></a>
+                                            <a href="{{ route('deactivate-product',Crypt::encrypt($product->id)) }}" class="btn btn-xs btn-danger" data-toggle="tooltip"  data-container="body" title="Deactivate product" onclick="return confirm('Are you sure')"><i class="fa fa-times"></i></a>
                                             @endif
                                         @endif
                                         @if($product->assigned_product_to_client)
-                                    <a href="{{route('transfer-assign-product-to-another-client', Crypt::encrypt($product->assigned_product_to_client->id))}}" title="Transfer product" class="btn bg-light-green waves-effect" data-toggle="tooltip" data-container="body"><i class="fa fa-exchange"></i></a>
+                                    <a href="{{route('transfer-assign-product-to-another-client', Crypt::encrypt($product->assigned_product_to_client->id))}}" title="Transfer product" class="btn btn-xs bg-light-green waves-effect" data-toggle="tooltip" data-container="body"><i class="fa fa-exchange"></i></a>
                                         @endif
                                     </div>
                                 </td>
@@ -140,16 +177,13 @@
 
 <div id="myModal" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg">
-
-        <!-- Modal content-->
         <div class="modal-content">
             <form action="" method="get">
-
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">Filter Products By</h4>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body">                  
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group form-float">
@@ -166,7 +200,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-md-4">
                             <div class="form-group form-float">
                                 <div class="form-line">
@@ -182,9 +215,6 @@
                                 </div>
                             </div>
                         </div>
-
-
-
                         <div class="col-md-4">
                             <div class="form-group form-float">
                                 <div class="form-line">
@@ -201,9 +231,7 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="row">
-
                         <div class="col-md-4">
                             <div class="form-group form-float">
                                 <div class="form-line">
@@ -212,7 +240,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-md-4">
                             <div class="form-group form-float">
                                 <div class="form-line">
@@ -228,7 +255,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-md-4">
                             <div class="form-group form-float">
                                 <div class="form-line">
@@ -245,9 +271,7 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="row">
-
                         <div class="col-md-4">
                             <div class="form-group form-float">
                                 <div class="form-line">
@@ -263,38 +287,29 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-md-4">
                             <div class="form-group form-float">
                                 <div class="form-line">
                                     <input type="text" class="form-control" id="date_of_purchase" name="date_of_purchase" placeholder="Date of purchase eg,(dd-mm-yyyy)" data-zdp_readonly_element="false" value="{{ old('date_of_purchase') }}">
-                                    <!--<label class="form-label">DOB</label>-->
                                 </div>
                             </div>
                         </div>
-
-
                         <div class="col-md-4">
                             <div class="form-group form-float">
                                 <div class="form-line">
                                     <input type="text" class="form-control" id="manufacture_date" name="manufacture_date" data-zdp_readonly_element="false" placeholder="Menufacture date eg,(dd-mm-yyyy)" value="{{ old('manufacture_date') }}">
-                                    <!--<label class="form-label">DOB</label>-->
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-primary waves-effect"  type="submit">Filter</button>
-                    <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>-->
                 </div>
             </form>
         </div>
-
     </div>
 </div>
-
 @endsection
 
 
