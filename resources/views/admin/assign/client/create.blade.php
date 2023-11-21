@@ -83,6 +83,17 @@
 								</div>
 							</div>
 						</div>
+
+						<div class="col-md-3">
+							<div class="form-group form-float">
+								<div class="form-line">
+									 <select class="form-control show-tick" name="product_id" id="product_id" required>
+		                                <option value=""> Please select a Product </option>	    
+		                            </select>
+								</div>
+							</div>
+						</div>
+
 					</div>
 
 						<!--<div class="col-md-6">
@@ -286,16 +297,12 @@ $(document).ready(function(){
   });
   });
 
-
- $("#group_id").change(function(){
-  
+var response_data ='';
+ $("#group_id").change(function(){ 
   var group_id = $('option:selected', this).attr('data-themeid');
-
   var e = document.getElementById("company_id");
   var company_id = e.options[e.selectedIndex].value;
-  
   // alert(company_id);
-
   $.ajax({
     type: "GET",
     url: "{{ route('get-details-assign-new-product-to-client.ajax') }}",
@@ -304,54 +311,60 @@ $(document).ready(function(){
       'group_id': group_id
 
     },
-
     success: function(response) {
       if(response) {
-
+		$("#product_id").empty();
+		var toAppend = [''];
+		$.each(response, function(i,o){		
+			toAppend += '<option value="'+o.id+'">'+o.name+'</option>'
+		});
+		$("#product_id").append(toAppend);
+		response_data = response;
+		console.log(response_data);
         // console.log(response.group_id);
-		if (!$.trim(response)){ 
-			 // alert("is not blank: " + response);
-			$('.no_data').hide();
-			$('#cnt_submt').hide();
-            $('#error_msg').fadeIn(1000);
-            $('#p_details').hide();
-            $('.auto_hide').hide();
-            $('#select_all').hide();
-            $("#cnt_submt").prop("disabled", true);
-        }else{
-		 var toAppend = '';
+				// 	if (!$.trim(response)){ 
+				// 		 // alert("is not blank: " + response);
+				// 		$('.no_data').hide();
+				// 		$('#cnt_submt').hide();
+				//         $('#error_msg').fadeIn(1000);
+				//         $('#p_details').hide();
+				//         $('.auto_hide').hide();
+				//         $('#select_all').hide();
+				//         $("#cnt_submt").prop("disabled", true);
+				//     }else{
+				// 	 var toAppend = '';
 
-        toAppend +='<tr><th>Product name</th><th>Product code</th><th>Product model no</th><th>Product brand</th><th>Product serial code</th><th>Date of install</th></tr>';
-        $.each(response, function(i,o){
+				//     toAppend +='<tr><th>Product name</th><th>Product code</th><th>Product model no</th><th>Product brand</th><th>Product serial code</th><th>Date of install</th></tr>';
+				//     $.each(response, function(i,o){
 
-         date_of_purchase = '';
-          if (o.date_of_purchase != '0000-00-00') 
-          {
-            date_of_purchase = o.date_of_purchase;
-          }
+				//      date_of_purchase = '';
+				//       if (o.date_of_purchase != '0000-00-00') 
+				//       {
+				//         date_of_purchase = o.date_of_purchase;
+				//       }
 
-          toAppend += '<tr><th scope="row"><input type="checkbox" id="product_detail'+o.id+'" name="product_detail[]" class="chk-col-cyan product_detail" value="'+o.id+'" aria-required="true" checked /><label for="product_detail'+o.id+'">'+o.name+'</label></th><td>'+o.brand+'</td><td>'+o.product_code+'</td><td>'+o.model_no+'</td><td>'+o.serial_no+'</td><td><input type="text" style="width:200px;" name="date_of_install[]" class="form-control datepicker" value="'+date_of_purchase+'" id="datepicker'+o.id+'" placeholder="eg,(dd-mm-yyyy)" data-zdp_readonly_element="false"></td></tr>'
-        });
+				//       toAppend += '<tr><th scope="row"><input type="checkbox" id="product_detail'+o.id+'" name="product_detail[]" class="chk-col-cyan product_detail" value="'+o.id+'" aria-required="true" checked /><label for="product_detail'+o.id+'">'+o.name+'</label></th><td>'+o.brand+'</td><td>'+o.product_code+'</td><td>'+o.model_no+'</td><td>'+o.serial_no+'</td><td><input type="text" style="width:200px;" name="date_of_install[]" class="form-control datepicker" value="'+date_of_purchase+'" id="datepicker'+o.id+'" placeholder="eg,(dd-mm-yyyy)" data-zdp_readonly_element="false"></td></tr>'
+				//     });
 
-        $('.no_data').show();
-        $('#p_details').html(toAppend);
-        $('.auto_hide').show();
-        $('#error_msg').fadeOut(1000);
-        $('#select_all').show();
-        $('#cnt_submt').show();
-        $("#cnt_submt").prop("disabled", false);
+				//     $('.no_data').show();
+				//     $('#p_details').html(toAppend);
+				//     $('.auto_hide').show();
+				//     $('#error_msg').fadeOut(1000);
+				//     $('#select_all').show();
+				//     $('#cnt_submt').show();
+				//     $("#cnt_submt").prop("disabled", false);
 
-        // document.getElementByClass("product_detail").checked = true;
+				//     // document.getElementByClass("product_detail").checked = true;
 
-        $('#p_details').html(toAppend).find('input[id^=datepicker]').Zebra_DatePicker({
-	      format: 'd-m-Y',
-	      direction: false
-	    });
-    	}
+				//     $('#p_details').html(toAppend).find('input[id^=datepicker]').Zebra_DatePicker({
+				//       format: 'd-m-Y',
+				//       direction: false
+				//     });
+				// 	}
 
-      }else{
-        alert("No details found");
-      }
+				//   }else{
+				//     alert("No details found");
+       }
     }
   });
   });

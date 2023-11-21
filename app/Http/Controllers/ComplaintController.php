@@ -648,41 +648,28 @@ class ComplaintController extends Controller
     public function assignToEngineer($id)
     {
         $complaint_id = Crypt::decrypt($id);
-        // $complaint_details = Complaint::with('client','group','product','comp_master','user')->where('id',$complaint_id)->where('status',1)->first();
-
         $complaint_details = DB::table('complaints')
                 ->leftJoin('clients','clients.id','complaints.client_id')
                 ->leftJoin('groups','groups.id','complaints.group_id')
                 ->leftJoin('products','products.id','complaints.product_id')
                 ->leftJoin('complaint_masters','complaint_masters.id','complaints.complaint_master_id')
                 ->leftJoin('users','users.id','complaints.complaint_entry_by')
-
                 ->leftJoin('zones','zones.id','clients.zone_id')
                 ->leftJoin('companies','companies.id','products.company_id')
-
                 ->leftJoin('assign_product_to_client','assign_product_to_client.product_id','complaints.product_id')
                 ->where('complaints.id',$complaint_id)
                 ->where('complaints.status',1)
-
                 ->select('complaints.*','complaint_masters.complaint_details as complaint_details','users.first_name as first_name','users.middle_name as middle_name','users.last_name as last_name','clients.name as c_name','clients.branch_name as c_branch_name','zones.name as z_name','clients.email as c_email','clients.ph_no as c_ph_no','clients.address as c_address','clients.remarks as c_remarks','products.name as p_name','groups.name as g_name','products.serial_no as p_serial_no','products.product_code as p_product_code','products.model_no as p_model_no','products.brand as p_brand','companies.name as company_name','assign_product_to_client.date_of_install as date_of_install')
-
                 ->first();
 
         $complaint_trans = DB::table('complaint_transactions')
-
                         ->leftJoin('assign_engineers','complaint_transactions.transaction_assigned_by','assign_engineers.engineer_id')
-
                         ->leftJoin('users','complaint_transactions.transaction_assigned_by','users.id')
                         ->where('complaint_transactions.status',1)
                         ->select('complaint_transactions.transaction_assigned_by as transaction_assigned_by','users.first_name as first_name','users.middle_name as middle_name','users.last_name as last_name','assign_engineers.zone_id as zone_id','users.email as email','users.ph_no as ph_no','users.emp_code as emp_code','users.emp_designation as emp_designation','users.role as role','complaint_transactions.remarks as remarks')
                         ->first();
 
-        // dd($complaint_details);
-
-        // $zones = Zone::where('status',1)->get();
-
         $assigned_engineers_zone = AssignEngineer::with('zone','user')->where('status',1)->get();
-        //dd($assigned_engineers_zone);
         $users = User::where('user_type',3)->where('status',1)->get();
 
           
@@ -695,10 +682,6 @@ class ComplaintController extends Controller
         })
         ->get();
         $zones = Zone::whereIn('id',$all_zones)->where('status',1)->get();
-
-        // dd($zones);
-       
-        
         return view('admin.complaint.assign-to',compact('complaint_details','assigned_engineers_zone','complaint_trans','zones', "assigned_engineers",'users'));
     }
 
