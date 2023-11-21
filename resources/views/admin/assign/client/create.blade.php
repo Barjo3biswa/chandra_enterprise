@@ -374,7 +374,7 @@ var response_data ='';
   $("#product_id").change(function(){
 	var index = $("#product_id").val();
 	console.log(response_data[index]);
-		if (!$.trim(response)){ 
+		if (!$.trim(response_data)){ 
 			$('.no_data').hide();
 			$('#cnt_submt').hide();
 			$('#error_msg').fadeIn(1000);
