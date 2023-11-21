@@ -318,7 +318,7 @@ var response_data ='';
 		
 		var toAppend = [''];
 		$.each(response, function(i,o){		
-			toAppend += '<option value="'+i+'">'+o.name+(o.serial_no)+'</option>'
+			toAppend += '<option value="'+i+'">'+o.name+' ('+o.serial_no+')</option>'
 		});
 		$("#product_id").append(toAppend);
 		response_data = response;
