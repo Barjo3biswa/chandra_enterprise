@@ -303,6 +303,8 @@ var response_data ='';
   var e = document.getElementById("company_id");
   var company_id = e.options[e.selectedIndex].value;
   // alert(company_id);
+  $('#p_details').empty();
+  $("#product_id").empty();
   $.ajax({
     type: "GET",
     url: "{{ route('get-details-assign-new-product-to-client.ajax') }}",
@@ -313,10 +315,10 @@ var response_data ='';
     },
     success: function(response) {
       if(response) {
-		$("#product_id").empty();
+		
 		var toAppend = [''];
 		$.each(response, function(i,o){		
-			toAppend += '<option value="'+o.id+'">'+o.name+'</option>'
+			toAppend += '<option value="'+i+'">'+o.name+(o.serial_no)+'</option>'
 		});
 		$("#product_id").append(toAppend);
 		response_data = response;
@@ -368,6 +370,40 @@ var response_data ='';
     }
   });
   });
+
+  $("#product_id").change(function(){
+	var index = $("#product_id").val();
+	console.log(response_data[index]);
+		if (!$.trim(response)){ 
+			$('.no_data').hide();
+			$('#cnt_submt').hide();
+			$('#error_msg').fadeIn(1000);
+			$('#p_details').hide();
+			$('.auto_hide').hide();
+			$('#select_all').hide();
+			$("#cnt_submt").prop("disabled", true);
+		}else{
+			var toAppend = '';
+			toAppend +='<tr><th>Product name</th><th>Product code</th><th>Product model no</th><th>Product brand</th><th>Product serial code</th><th>Date of install</th></tr>';
+			date_of_purchase = '';
+			if (response_data[index].date_of_purchase != '0000-00-00') 
+			{
+			date_of_purchase = response_data[index].date_of_purchase;
+			}
+			toAppend += '<tr><th scope="row"><input type="checkbox" id="product_detail'+response_data[index].id+'" name="product_detail[]" class="chk-col-cyan product_detail" value="'+response_data[index].id+'" aria-required="true" checked /><label for="product_detail'+response_data[index].id+'">'+response_data[index].name+'</label></th><td>'+response_data[index].brand+'</td><td>'+response_data[index].product_code+'</td><td>'+response_data[index].model_no+'</td><td>'+response_data[index].serial_no+'</td><td><input type="text" style="width:200px;" name="date_of_install[]" class="form-control datepicker" value="'+date_of_purchase+'" id="datepicker'+response_data[index].id+'" placeholder="eg,(dd-mm-yyyy)" data-zdp_readonly_element="false"></td></tr>';
+			$('.no_data').show();
+			$('#p_details').html(toAppend);
+			$('.auto_hide').show();
+			$('#error_msg').fadeOut(1000);
+			$('#select_all').show();
+			$('#cnt_submt').show();
+			$("#cnt_submt").prop("disabled", false);
+			$('#p_details').html(toAppend).find('input[id^=datepicker]').Zebra_DatePicker({
+				format: 'd-m-Y',
+				direction: false
+			});
+		}
+  })
  </script>
 @stop
 
