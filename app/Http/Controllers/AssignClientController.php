@@ -87,7 +87,7 @@ class AssignClientController extends Controller
         $c_name = $request->client_id;
         $branch = $request->branch;
 
-        $c_id = Client::where('branch_name',$branch)->where('name',$c_name)->first()->id;
+        $c_id = Client::where('branch_name',$branch)->where('name',$c_name)->where('status',1)->first()->id;
 
         // dd($c_id);
 
