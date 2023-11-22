@@ -66,13 +66,13 @@
                                         <select class="form-control show-tick" name="branch" id="branch" required>
                                             <option value=""> Please select a branch </option>
 
-                                            @foreach ($clients as $cp)
+                                            {{-- @foreach ($clients as $cp)
                                                 @if ($cp->branch_name == old('branch'))
                                                     <option value="{{ $cp->branch_name }}"
                                                         {{ old('branch') == $cp->branch_name ? 'selected' : '' }}>
                                                         {{ ucwords($cp->branch_name) }}</option>
                                                 @endif
-                                            @endforeach
+                                            @endforeach --}}
 
                                         </select>
                                         <label class="form-label">Select branch</label>

@@ -910,7 +910,7 @@ class ClientAmcController extends Controller
     {
         $client_name = $request->client_id;
         $branch = $request->branch;
-        $client_id = Client::where('name',$client_name)->where('branch_name',$branch)->whereStatus(1)->first()->id;
+        $client_id = Client::where('name',$client_name)->where('branch_name',$branch)->where('status',1)->first()->id;
         Log::info(Client::where('name',$client_name)->where('branch_name',$branch)->get());
         // dd($client_id);
 
