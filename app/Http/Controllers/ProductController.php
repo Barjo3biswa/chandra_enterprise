@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Assign\AssignProductToClient;
 use Illuminate\Http\Request;
 use Session,DB,Crypt,Validator,Redirect,Excel;
 use App\Models\Product, App\User, App\Models\Brand, App\Models\Group, App\Models\SubGroup, App\Models\Company;
@@ -348,6 +349,7 @@ class ProductController extends Controller
             $product = Product::where('id',$p_id)->where('status', 2)->first();
             $product->status        = 0;
             $product->save();
+            AssignProductToClient::where(['product_id'=>$p_id, 'status'=>1])->update(['status'=>0]);
             Session::flash('success','Successfully Deleted product details');
             return redirect()->route('view-all-product');
     
@@ -363,9 +365,9 @@ class ProductController extends Controller
     {
         $product_id = Crypt::decrypt($id);
         $product = Product::where('id', $product_id)->where('status', 1)->first();
-        $product->status                 = 2;
+        $product->status = 2;
         $product->save();
-
+        AssignProductToClient::where(['product_id'=>$product_id, 'status'=>1])->update(['status'=>0]);
         Session::flash('success', 'Successfully deactivated product details');
         return Redirect::route('view-all-product');
     }

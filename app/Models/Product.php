@@ -50,8 +50,8 @@ class Product extends Model
 	public function assigned_product_to_client()
 	{
 		return $this->hasOne(AssignProductToClient::class, 'product_id', 'id')
-		->where('status',1)
-		->orderBy("id", "ASC");
+		->where('status',1);
+		// ->orderBy("id", "ASC");
 	}
 	public function assigned_branch()
 	{

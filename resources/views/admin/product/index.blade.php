@@ -130,6 +130,7 @@
                                 <td>
                                     {{$product->newAssigtnedBranch->client->name??"Not Assigned"}}
                                     {{$product->newAssigtnedBranch->client->branch_name??"NA"}}
+                                    
                                 </td>
 
                                 <td>
