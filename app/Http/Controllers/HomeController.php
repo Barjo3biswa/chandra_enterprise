@@ -112,16 +112,16 @@ class HomeController extends Controller
             // dump($count->count());
             
             if($count->count()>1){
-                // $test =$test+1;
+                $test =$test+1;
                 // update_remark = 'one_record_found'
                 foreach($count as $check){
                     $amc_check = ClientAmcMaster::where('client_id',$check->id)->get();
                     $complant = Complaint::where('client_id',$check->id)->get();
-                    if($amc_check->count() ==0 || $complant->count() == 0){
-                        $test =$test+1;
-                    }else{
-                        $test =$test+1;
-                    }
+                    // if($amc_check->count() ==0 || $complant->count() == 0){
+                    //     $test =$test+1;
+                    // }else{
+                    //     $test =$test+1;
+                    // }
                     // if($check->id)
                 }
             }
