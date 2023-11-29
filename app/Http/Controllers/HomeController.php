@@ -112,7 +112,7 @@ class HomeController extends Controller
             // dump($count->count());
             
             if($count->count()>1){
-                // $test =$test+1;
+                $test =$test+1;
                 // update_remark = 'one_record_found'
                 foreach($count as $check){
                     $amc_check = ClientAmcMaster::where('client_id',$check->id)->get();
@@ -121,7 +121,7 @@ class HomeController extends Controller
                         $test =$test;
                     }else{
                         // $test =$test+1;
-                        dump($check->id);
+                        // dump($check->id);
                     }
                     
                 }
