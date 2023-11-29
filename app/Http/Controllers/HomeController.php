@@ -100,34 +100,57 @@ class HomeController extends Controller
                 }
         return view('home',compact('tot_company','tot_products','tot_users','tot_clients','tot_complaints','engg_tot_assigned_complaints','tot_pendind_complaints','tot_closed_complaints','tot_assigned_complaints','tot_amc','tot_assigned_clients','client_amc','tot_client_amc','tot_dsr','monthly_amcs','engg_tot_closed_complaints','engg_tot_complaints','client_master'));
     }
+    
 
     public function testing(){
+        $Zones=['Zone 01' => 1,'Zone 02' => 2,'Zone 03' => 3,'Zone 04' => 4,'Zone 05' => 5,'Zone 06' => 6,'Zone 07' => 7,'Zone 08' => 8,'Zone 09' => 9,'Zone 10' => 10,'Zone 11' => 11,'Zone 12' => 12,'Zone 13' => 13,'Zone 14' => 14,'Zone 15' => 15,'Zone 16' => 16,'Zone 17' => 17,'Zone 18' => 18,'Zone 19' => 19,'Zone 20' => 20,'Zone 21' => 21,'Zone 22' => 22,'Zone 23' => 23,'Zone 24' => 24,'Zone 25' => 28,'Zone 26' => 29,'Zone 27' => 30,'Zone 28' => 31,'Zone 29' => 32,'Zone 30' => 25,];
         $test = 0;
         $rev_client = DB::table('uploaded_tests')->get();
         foreach($rev_client as $key=> $rev_cl){
-            $bank_name = $rev_cl->bank_name;
+            $bank_name = $rev_cl->bank_name; 
             $branch_name = $rev_cl->branch_name;
-            $count = Client::where('status',1)->where('name',$bank_name)->where('branch_name',$branch_name)->get();
-            // $count = Client::where('status',1)->where('name', 'LIKE', '%' .$bank_name. '%')->where('branch_name', 'LIKE', '%' .$branch_name. '%')->get();
-            // dump($count->count());
-            
-            if($count->count()>0){
-                $test =$test+1;
-                // update_remark = 'one_record_found'
-                foreach($count as $check){
+            $client = Client::where('status',1)->where('name',$bank_name)->where('branch_name',$branch_name)->get();
+            // $client = Client::where('status',1)->where('name', 'LIKE', '%' .$bank_name. '%')->where('branch_name', 'LIKE', '%' .$branch_name. '%')->get();
+            // dump($client->count());
+            $count_val = $client->count();
+            if($client->count()==1){
+                $data = [
+                    'zone_id' => $Zones[$rev_cl->zone],
+                    'update_remark' => 'one_record_found',
+                ];
+            }
+            else if($count_val > 1){
+                $flag=1;
+                foreach($client as $key=>$check){
                     $amc_check = ClientAmcMaster::where('client_id',$check->id)->get();
                     $complant = Complaint::where('client_id',$check->id)->get();
                     if($amc_check->count() ==0 || $complant->count() == 0){
+                        if(++$key == $count_val && $flag==1){
+                            $data = [
+                                'zone_id' => $Zones[$rev_cl->zone],
+                                'update_remark' => 'multiple_record_found',
+                            ];
+                        }else{
+                            $data = [
+                                'status' => 0,
+                                'update_remark' => 'multiple_record_found',
+                            ];
+                        }
                         $test =$test;
                     }else{
-                        // $test =$test+1;
-                        // dump($check->id);
+                        $data = [
+                            'zone_id' => $Zones[$rev_cl->zone],
+                            'update_remark' => 'multiple_record_found',
+                        ];
+                        $flag = 0;
                     }
                     
                 }
             }
         }
 
-        dd($test);
+        dd("success");
     }
+
+    
 }
