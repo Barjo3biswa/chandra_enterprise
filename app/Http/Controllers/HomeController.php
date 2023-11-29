@@ -120,9 +120,10 @@ class HomeController extends Controller
                     if($amc_check->count() ==0 || $complant->count() == 0){
                         $test =$test;
                     }else{
-                        $test =$test+1;
+                        // $test =$test+1;
+                        dump($check->id);
                     }
-                    // if($check->id)
+                    
                 }
             }
         }
