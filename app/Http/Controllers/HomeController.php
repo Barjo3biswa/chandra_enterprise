@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Assign\AssignProductToClient;
 use Illuminate\Http\Request;
 
 use App\User, App\Models\Company, App\Models\Product, App\Models\Client, App\Models\Complaint, App\Models\Assign\AssignEngineer, App\Models\ClientAmcMaster, App\Models\Dsr\DailyServiceReport, App\Models\ClientAmcTransaction;
@@ -135,7 +136,8 @@ class HomeController extends Controller
                 foreach($client as $key=>$check){
                     $amc_check = ClientAmcMaster::where('client_id',$check->id)->get();
                     $complant = Complaint::where('client_id',$check->id)->get();
-                    if($amc_check->count() ==0 || $complant->count() == 0){
+                    $product_assigned = AssignProductToClient::where('client_id',$check->id)->where('status',1)->get();
+                    if($amc_check->count() ==0 || $complant->count() == 0 || $product_assigned->count() ==0){
                         if(++$key == $count_val && $flag==1){
                             $data = [
                                 'zone_id' => $Zones[$rev_cl->zone],
