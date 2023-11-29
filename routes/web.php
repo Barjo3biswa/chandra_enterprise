@@ -56,6 +56,8 @@ Route::get('/dashboard', [
 
 Route::get('/home', 'HomeController@index')->name('home');
 
+Route::get('/testing', 'HomeController@testing')->name('testing');
+
 Route::group(['prefix' => 'change-password'], function () {
     Route::get('/', [
           'as' => 'change-password',
