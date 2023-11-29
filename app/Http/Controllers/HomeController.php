@@ -136,8 +136,7 @@ class HomeController extends Controller
                 foreach($client as $key=>$check){
                     $amc_check = ClientAmcMaster::where('client_id',$check->id)->get();
                     $complant = Complaint::where('client_id',$check->id)->get();
-                    $product_assigned = AssignProductToClient::where('client_id',$check->id)->where('status',1)->get();
-                    if($amc_check->count() ==0 || $complant->count() == 0 || $product_assigned->count() ==0){
+                    if($amc_check->count() ==0 && $complant->count() == 0 && $check->isAssigned ==0){
                         if(++$key == $count_val && $flag==1){
                             $data = [
                                 'zone_id' => $Zones[$rev_cl->zone],
