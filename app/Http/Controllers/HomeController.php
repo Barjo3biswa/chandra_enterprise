@@ -111,7 +111,7 @@ class HomeController extends Controller
             // $count = Client::where('status',1)->where('name', 'LIKE', '%' .$bank_name. '%')->where('branch_name', 'LIKE', '%' .$branch_name. '%')->get();
             // dump($count->count());
             
-            if($count->count()>1){
+            if($count->count()>0){
                 $test =$test+1;
                 // update_remark = 'one_record_found'
                 foreach($count as $check){
