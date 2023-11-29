@@ -115,9 +115,17 @@ class HomeController extends Controller
             $count_val = $client->count();
             if($client->count()==1){
                 $data = [
+                    'status' => 0,
+                    'update_remark' => 'no_record_found',
+                ];
+                $client = Client::where('id',$client[0]->id)->update($data);
+            }
+            else if($client->count()==1){
+                $data = [
                     'zone_id' => $Zones[$rev_cl->zone],
                     'update_remark' => 'one_record_found',
                 ];
+                $client = Client::where('id',$client[0]->id)->update($data);
             }
             else if($count_val > 1){
                 $flag=1;
@@ -130,11 +138,13 @@ class HomeController extends Controller
                                 'zone_id' => $Zones[$rev_cl->zone],
                                 'update_remark' => 'multiple_record_found',
                             ];
+                            $client = Client::where('id',$check->id)->update($data);
                         }else{
                             $data = [
                                 'status' => 0,
                                 'update_remark' => 'multiple_record_found',
                             ];
+                            $client = Client::where('id',$check->id)->update($data);
                         }
                         $test =$test;
                     }else{
@@ -142,6 +152,7 @@ class HomeController extends Controller
                             'zone_id' => $Zones[$rev_cl->zone],
                             'update_remark' => 'multiple_record_found',
                         ];
+                        $client = Client::where('id',$check->id)->update($data);
                         $flag = 0;
                     }
                     
