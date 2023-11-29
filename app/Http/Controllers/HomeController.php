@@ -112,13 +112,16 @@ class HomeController extends Controller
             $client = Client::where('status',1)->where('name',$bank_name)->where('branch_name',$branch_name)->get();
             // $client = Client::where('status',1)->where('name', 'LIKE', '%' .$bank_name. '%')->where('branch_name', 'LIKE', '%' .$branch_name. '%')->get();
             // dump($client->count());
+            
+            // dump($Zones[$rev_cl->zone]);
+            
             $count_val = $client->count();
             if($client->count()==0){
                 $data = [
-                    'status' => 0,
+                    // 'status' => 0,
                     'update_remark' => 'no_record_found',
                 ];
-                $client = Client::where('id',$client[0]->id)->update($data);
+                $client = DB::table('uploaded_tests')->where('id',$rev_cl->id)->update($data);
             }
             else if($client->count()==1){
                 $data = [
