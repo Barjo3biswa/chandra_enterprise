@@ -98,6 +98,8 @@
                                         <td>{{ ucwords($client_amc->client->name??"NA") }}</td>
                                         <td>{{ ucwords($client_amc->client->branch_name??"NA") }}</td>
                                         <td>{{ ucwords($client_amc->roster->roster_name) }}</td>
+
+                                        
                                         <td>
                                             @if ($client_amc->amc_start_date != '0000-00-00')
                                                 {{ date('d M, Y', strtotime($client_amc->amc_start_date)) }}
