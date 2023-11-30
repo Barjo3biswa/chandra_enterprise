@@ -95,8 +95,8 @@
                                     <tr style="color: {{ $colour }}">
                                         <td>{{ ++$key }}</td>
                                         <td>{{ ucwords($client_amc->client->zone->name ?? 'NA') }}</td>
-                                        <td>{{ ucwords($client_amc->client->name) }}</td>
-                                        <td>{{ ucwords($client_amc->client->branch_name) }}</td>
+                                        <td>{{ ucwords($client_amc->client->name??"NA") }}</td>
+                                        <td>{{ ucwords($client_amc->client->branch_name??"NA") }}</td>
                                         <td>{{ ucwords($client_amc->roster->roster_name) }}</td>
                                         <td>
                                             @if ($client_amc->amc_start_date != '0000-00-00')
