@@ -238,6 +238,8 @@ class ClientController extends Controller
         $client = Client::with('zone','region','state','district')->where('id',$c_id)->where('status',1)->first();
         $client->status =0;
         $client->save();
+        AssignProductToClient::where('client_id',$c_id)->update(['status'=>0]);
+        AMC
         Session::flash('success','Successfully deactivated client deatils');
         return redirect()->route('view-all-client');
     }
