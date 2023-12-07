@@ -239,7 +239,6 @@ class ClientController extends Controller
         $client->status =0;
         $client->save();
         AssignProductToClient::where('client_id',$c_id)->update(['status'=>0]);
-        AMC
         Session::flash('success','Successfully deactivated client deatils');
         return redirect()->route('view-all-client');
     }
