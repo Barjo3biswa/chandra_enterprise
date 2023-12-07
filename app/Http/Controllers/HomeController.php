@@ -174,12 +174,12 @@ class HomeController extends Controller
               $as_en = AssignEngineer::where('client_id',$c->id)->where('status',1)->first();
               if($as_en){
                 if($c->zone_id != $as_en->zone_id){
-                    $engineer_id = AssignEngineer::where('zone_id',$c->zone_id)->first()->engineer_id;
+                    $engineer_id = AssignEngineer::where('zone_id',$c->zone_id)->first();
                     if($engineer_id){
                         $as_en->update(['engineer_id' => $engineer_id->engineer_id, 'zone_id'=>$c->zone_id]);
                     }  else{
                         $as_en->delete();
-                        Client::where('id',$c->id)->update(['isAssignedToEngineer'=>0])
+                        Client::where('id',$c->id)->update(['isAssignedToEngineer'=>0]);
                     }                
                   }
               }  
