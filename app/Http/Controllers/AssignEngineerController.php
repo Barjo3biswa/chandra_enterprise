@@ -142,7 +142,9 @@ class AssignEngineerController extends Controller
 
         $assign_eng_name = AssignEngineer::with('user','client','zone')->where('engineer_id',$aseng_id)->groupBy('engineer_id')->first();
  
-        $assign_eng = AssignEngineer::with('user','client','client.assigned_products')->where('engineer_id',$aseng_id)->get();
+        $assign_eng = AssignEngineer::with('user','client','client.assigned_products')
+                                    ->wherehas('client')
+                                    ->where('engineer_id',$aseng_id)->get();
        
         return view('admin.assign.engineer.show',compact('assign_eng','assign_eng_name'));
     }
