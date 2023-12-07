@@ -173,7 +173,7 @@ class HomeController extends Controller
         foreach($clients as $key=>$c){
               $as_en = AssignEngineer::where('client_id',$c->id)->where('status',1)->first();
               if($c->zone_id != $as_en->zone_id){
-                $engineer_id = AssignEngineer::where('zone_id',$c->zone_id)->engineer_id;
+                $engineer_id = AssignEngineer::where('zone_id',$c->zone_id)->first()->engineer_id;
                 $as_en->update(['engineer_id' => $engineer_id, 'zone_id'=>$c->zone_id]);
               }
         }
