@@ -189,8 +189,8 @@ class HomeController extends Controller
     }
 
     public function testing(){
-        $as_en = AssignEngineer::where('status',1)->where('updated_at',null)->first();
-        dd($as_en);
+        $as_en = AssignEngineer::where('status',1)->where('updated_at',null)->get();
+        // dd($as_en);
         foreach($as_en as $en){
             $clent = Client::where('id',$en->client_id)->first();
             if($clent->status ==0){
