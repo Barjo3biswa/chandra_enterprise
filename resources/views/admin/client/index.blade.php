@@ -80,7 +80,7 @@
                             <tr>
                             	<td>{{ $i }}</td>
                                 <td>{{ ucwords($client->name) }}</td>
-                                <td>{{ ucwords($client->branch_name) }}</td>
+                                <td>{{ ucwords($client->branch_name) }} <br/> ({{$client->update_remark}})</td>
                                 <td>
                                     @if($client->zone_id != null)
                                     {{ ucwords($client->zone->name) }}
