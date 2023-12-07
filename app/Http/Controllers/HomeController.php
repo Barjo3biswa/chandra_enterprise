@@ -103,7 +103,7 @@ class HomeController extends Controller
     }
     
 
-    public function testing(){
+    public function ChangeZoneIDOfClients  (){
         $Zones=['Zone 01' => 1,'Zone 02' => 2,'Zone 03' => 3,'Zone 04' => 4,'Zone 05' => 5,'Zone 06' => 6,'Zone 07' => 7,'Zone 08' => 8,'Zone 09' => 9,'Zone 10' => 10,'Zone 11' => 11,'Zone 12' => 12,'Zone 13' => 13,'Zone 14' => 14,'Zone 15' => 15,'Zone 16' => 16,'Zone 17' => 17,'Zone 18' => 18,'Zone 19' => 19,'Zone 20' => 20,'Zone 21' => 21,'Zone 22' => 22,'Zone 23' => 23,'Zone 24' => 24,'Zone 25' => 28,'Zone 26' => 29,'Zone 27' => 30,'Zone 28' => 31,'Zone 29' => 32,'Zone 30' => 25,];
         $test = 0;
         $rev_client = DB::table('uploaded_tests')->get();
@@ -166,6 +166,21 @@ class HomeController extends Controller
 
         dd("success");
     }
+
+    public function testing(){
+        $Zones=['Zone 01' => 1,'Zone 02' => 2,'Zone 03' => 3,'Zone 04' => 4,'Zone 05' => 5,'Zone 06' => 6,'Zone 07' => 7,'Zone 08' => 8,'Zone 09' => 9,'Zone 10' => 10,'Zone 11' => 11,'Zone 12' => 12,'Zone 13' => 13,'Zone 14' => 14,'Zone 15' => 15,'Zone 16' => 16,'Zone 17' => 17,'Zone 18' => 18,'Zone 19' => 19,'Zone 20' => 20,'Zone 21' => 21,'Zone 22' => 22,'Zone 23' => 23,'Zone 24' => 24,'Zone 25' => 28,'Zone 26' => 29,'Zone 27' => 30,'Zone 28' => 31,'Zone 29' => 32,'Zone 30' => 25,];
+        $clients = Client::where('status',1)->get();
+        foreach($clients as $key=>$c){
+              $as_en = AssignEngineer::where('client_id',$c->id)->where('status',1)->first();
+              if($clients->zone_id != $as_en->zone_id){
+                $engineer_id = AssignEngineer::where('zone_id',$c->zone_id)->engineer_id;
+                $as_en->update(['engineer_id' => $engineer_id, 'zone_id'=>$c->zone_id]);
+              }
+        }
+        
+        dd("success");
+    }
+
 
     
 }
