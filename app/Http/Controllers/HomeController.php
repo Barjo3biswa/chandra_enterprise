@@ -194,7 +194,7 @@ class HomeController extends Controller
         foreach($as_en as $en){
             $clent = Client::where('id',$en->client_id)->first();
             if($clent->status ==0){
-                AssignEngineer::where('id',$en->id)->update(['ststus'=>0]);
+                AssignEngineer::where('id',$en->id)->update(['status'=>0]);
             }
         }
               
