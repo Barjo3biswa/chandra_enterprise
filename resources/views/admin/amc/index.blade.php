@@ -95,7 +95,7 @@
                                         // }
                                     @endphp
                                     <tr style="color: {{ $colour }}">
-                                        <td>{{ ++$key }} {{}}</td>
+                                        <td>{{ ++$key }}</td>
                                         <td>{{ ucwords($client_amc->client->zone->name ?? 'NA') }}</td>
                                         <td>{{ ucwords($client_amc->client->name??"NA") }}</td>
                                         <td>{{ ucwords($client_amc->client->branch_name??"NA") }}</td>
