@@ -83,7 +83,7 @@
 <script src="{!!asset('assets/js/jquery-datatable.js')!!}"></script>
 <script>
     $('.js-basic-example').DataTable({
-        pageLength: 50,
+        pageLength: 100,
         responsive: true
         
     });

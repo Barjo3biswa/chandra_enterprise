@@ -266,15 +266,14 @@
                                 </tr>
                             @endforeach
                         @endif
-                        @if ($all_engineers_belongs_to_client_zone->count())
+                        {{-- @if ($all_engineers_belongs_to_client_zone->count())
                             @foreach ($all_engineers_belongs_to_client_zone as $engineer)
                                 <tr>
                                     <td>{{$engineer->user->full_name()}} <strong>[{{$engineer->user->emp_code}}]</strong></td>
                                     <td>{{"Auto assigned same zone shared as client."}}</td>
-                                    {{-- <td></td> --}}
                                 </tr>
                             @endforeach
-                        @endif
+                        @endif --}}
                         @if(!$all_engineers_belongs_to_client_zone->count() && !$assigned_engineers->count())
                             <tr>
                                 <td colspan="3" class="text-center text-danger">Engineer not Assigned yet.</td>

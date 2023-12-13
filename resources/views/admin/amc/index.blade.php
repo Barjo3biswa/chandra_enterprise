@@ -80,20 +80,22 @@
                                     @php
                                         // dd()
                                         if ($client_amc->assigned_engineers->count() > 0) {
-                                            $colour = '#2B982B';
+                                            $colour = 'green';
+                                        }else{
+                                            $colour = '';
                                         }
-                                        if($client_amc->amc_master_transaction->where('engineer_status',1)->count()==0){
-                                            $colour = "green";
-                                        }
-                                        if($client_amc->amc_master_transaction->where('engineer_status',1)->count()>0 && $client_amc->amc_master_transaction->where('engineer_status',0)->count()>0){
-                                            $colour = "orange";
-                                        }
-                                        if($client_amc->amc_master_transaction->where('engineer_status',0)->count()==0){
-                                            $colour = "red";
-                                        }
+                                        // if($client_amc->amc_master_transaction->where('engineer_status',1)->count()==0){
+                                        //     $colour = "green";
+                                        // }
+                                        // if($client_amc->amc_master_transaction->where('engineer_status',1)->count()>0 && $client_amc->amc_master_transaction->where('engineer_status',0)->count()>0){
+                                        //     $colour = "orange";
+                                        // }
+                                        // if($client_amc->amc_master_transaction->where('engineer_status',0)->count()==0){
+                                        //     $colour = "red";
+                                        // }
                                     @endphp
                                     <tr style="color: {{ $colour }}">
-                                        <td>{{ ++$key }}</td>
+                                        <td>{{ ++$key }} {{}}</td>
                                         <td>{{ ucwords($client_amc->client->zone->name ?? 'NA') }}</td>
                                         <td>{{ ucwords($client_amc->client->name??"NA") }}</td>
                                         <td>{{ ucwords($client_amc->client->branch_name??"NA") }}</td>
